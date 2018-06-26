@@ -1,0 +1,14 @@
+## JeremyC. Remove all of the facets for now from the left-hand-side of the UI. 
+##          I don't fully understand yet how best to implement facets, so to
+##          keep the UI simple, I'll simply remove all of them.			  
+##
+###**
+## *  Overall Facet display block
+## *  Invokes the 4 facet and 1 cluster template
+## *#
+##
+###parse('facet_fields.vm')
+###parse('facet_queries.vm')
+###parse('facet_ranges.vm')
+###parse('facet_pivot.vm')
+###parse('cluster.vm')
