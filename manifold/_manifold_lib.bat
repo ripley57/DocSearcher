@@ -56,7 +56,7 @@ REM ////////////////////////////////////////////////////////////////////
 REM FUNC-MANIFOLD-START
 REM Start Manifold.
 REM
-REM Returns: 0 if installed successfully; otherwise >0
+REM Returns: 0 if started successfully; otherwise >0
 REM
 :FUNC-MANIFOLD-START
 	setlocal
@@ -92,7 +92,7 @@ REM ////////////////////////////////////////////////////////////////////
 REM FUNC-MANIFOLD-STOP
 REM Stop Manifold.
 REM
-REM Returns: 0 if installed successfully; otherwise >0
+REM Returns: 0 if stopped successfully; otherwise >0
 REM
 :FUNC-MANIFOLD-STOP
 	setlocal
