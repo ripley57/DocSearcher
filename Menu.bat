@@ -77,11 +77,11 @@ REM
 	REM Display warning if Java, Solr, or Manifold is not installed.
 	set display_warning=
 	call %DOCSEARCH_JAVA_LIB% :FUNC-JAVA-GET-INSTALLED-STATE
-	if "%RET%"=="NOT-INSTALLED" (set display_warning=yes&	echo     WARNING: Java is not installed ^(use option 5^))
+	if "%RET%"=="NOT-INSTALLED" (set display_warning=yes&	echo     WARN: Java is not installed ^(use option 5^))
 	call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-GET-INSTALLED-STATE
-	if "%RET%"=="NOT-INSTALLED" (set display_warning=yes& 	echo     WARNING: Solr is not installed ^(use option 5^))
+	if "%RET%"=="NOT-INSTALLED" (set display_warning=yes& 	echo     WARN: Solr is not installed ^(use option 5^))
     call %DOCSEARCH_MANIFOLD_LIB% :FUNC-MANIFOLD-GET-INSTALLED-STATE
-	if "%RET%"=="NOT-INSTALLED" (set display_warning=yes&	echo     WARNING: Manifold is not installed ^(use option 5^))
+	if "%RET%"=="NOT-INSTALLED" (set display_warning=yes&	echo     WARN: Manifold is not installed ^(use option 5^))
 	if defined display_warning (echo.)
 	
 	REM Indicate if solr is running.

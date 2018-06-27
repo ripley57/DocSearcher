@@ -639,8 +639,9 @@ REM
 			set RET=!RET!	!CONFIGSET_NAME!
 		)
 	)
-	REM Add "_default" for the Solr _default configset.
-	set RET=!RET!	_default
+	REM Add the Solr built-in configsets.
+	REM Note: There is a tab character between these values.
+	set RET=!RET!	_default	sample_techproducts_configs
 	goto :EXIT-FUNC-SOLR-GET-MY-CONFIGSET-LIST
 	
 	REM Given a file path return just the file name component.
