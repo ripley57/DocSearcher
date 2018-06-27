@@ -164,6 +164,10 @@ REM
 	echo     -------------------------------------------
 	echo     8.  Create Solr_Demo core with sample docs
 	echo     -------------------------------------------
+	rem JeremyC 27-06-2018.
+	rem I will hide these for now, as I don't think they are going to be used much.
+	rem They also cause start-up errors in the Solr log. Note: If I want to reenable
+	rem these, first check if there is a bin\solr.cmd option to do the same thing.
 	rem echo 9.  Disable a Solr core
 	rem echo -------------------------------------------
 	rem echo 10. Enable a Solr core
