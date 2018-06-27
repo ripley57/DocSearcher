@@ -872,6 +872,7 @@ REM
 	
 	:EXIT-FUNC-MENU-CREATE-SOLR-DEMO
 	if defined TRACE %TRACE% [proc :FUNC-MENU-CREATE-SOLR-DEMO return]
+	echo.
 	pause
 	endlocal
 	goto :eof
