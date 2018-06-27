@@ -71,7 +71,7 @@ REM          message in variable FUNC-EXTRACT-ZIP_ERROR_TEXT.
 	)
 
 	REM Perform the unzip.
-	set unzip_exe=%DOCSEARCH_UTILS_DIR%\unzip.exe
+	set unzip_exe=%DOCSEARCH_UTILS_DIR%\unzip\unzip.exe
 	if defined TRACE %TRACE% [proc :FUNC-UTILS-EXTRACT-ZIP Running %unzip_exe% %extraargs% %zipfilepath% -d %targetdir% ...]
 	                                                               %unzip_exe% %extraargs% %zipfilepath% -d %targetdir%
 	set RET=%errorlevel%
