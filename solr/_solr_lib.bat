@@ -99,14 +99,6 @@ REM
 	set FUNC-SOLR-START_ERROR_TEXT=
 	set RET=1
 	
-	call :FUNC-SOLR-GET-STATE xyz
-	if "%RET%"=="RUNNING" (
-		REM Solr already running.
-		set RET=2
-		set FUNC-SOLR-START_ERROR_TEXT=Solr is already running.
-		goto EXIT-FUNC-SOLR-START
-	)
-	
 	REM Start Solr.
 	cmd /C %DOCSEARCH_SOLR_BIN_DIR%\bin\solr.cmd start
 	
