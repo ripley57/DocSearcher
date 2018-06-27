@@ -11,10 +11,12 @@ REM JeremyC 18-6-2018
 
 REM Set local scope, initialize libraries and then call our MAIN procedure.
 setlocal & pushd & set RET=
+	set pwd=%~dp0
 	set SCRIPTNAME=%~nx0
 	set SCRIPTPATH=%~f0
 	REM To enable tracing, set DEBUG=1.
 	if "%DEBUG%"=="1" (set TRACE=echo) else (set TRACE=rem)
+	cmd /c %pwd%\scripts\rununix2dos.bat
 	call _docsearch_lib :INIT
 	call :MAIN %*
 popd & endlocal & set RET=%RET%
