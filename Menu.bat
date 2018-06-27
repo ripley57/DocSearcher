@@ -648,7 +648,11 @@ REM
 :FUNC-MENU-START-SOLR
 	setlocal
 	if defined TRACE %TRACE% [proc :FUNC-MENU-START-SOLR]
+	
 	echo.
+	echo Starting Solr ...
+	echo.
+	
 	if defined TRACE %TRACE% [Running call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-START ...]
 	                                  call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-START
 	echo.
@@ -664,7 +668,11 @@ REM
 :FUNC-MENU-STOP-SOLR
 	setlocal
 	if defined TRACE %TRACE% [proc FUNC-MENU-STOP-SOLR]
+	
 	echo.
+	echo Stopping Solr ...
+	echo.
+	
 	if defined TRACE %TRACE% [Running call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-STOP ...]
 	                                  call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-STOP
 	echo.
@@ -680,7 +688,11 @@ REM
 :FUNC-MENU-RESTART-SOLR
 	setlocal
 	if defined TRACE %TRACE% [proc FUNC-MENU-RESTART-SOLR]
+	
 	echo.
+	echo Restarting Solr ...
+	echo.	
+	
 	if defined TRACE %TRACE% [Running call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-RESTART ...]
 	                                  call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-RESTART
 	echo.
@@ -696,7 +708,11 @@ REM
 :FUNC-MENU-START-MANIFOLD
 	setlocal
 	if defined TRACE %TRACE% [proc :FUNC-MENU-START-MANIFOLD]
+
 	echo.
+	echo Starting ManifoldCF ...
+	echo.
+		
 	if defined TRACE %TRACE% [Running call %DOCSEARCH_MANIFOLD_LIB% :FUNC-MANIFOLD-START ...]
                                       call %DOCSEARCH_MANIFOLD_LIB% :FUNC-MANIFOLD-START
 	if not %RET% EQU 0 (
@@ -715,7 +731,11 @@ REM
 :FUNC-MENU-STOP-MANIFOLD
 	setlocal
 	if defined TRACE %TRACE% [proc :FUNC-MENU-STOP-MANIFOLD]
+	
 	echo.
+	echo Stopping ManifoldCF ...
+	echo.
+	
 	if defined TRACE %TRACE% [Running call %DOCSEARCH_MANIFOLD_LIB% :FUNC-MANIFOLD-STOP ...]
                                       call %DOCSEARCH_MANIFOLD_LIB% :FUNC-MANIFOLD-STOP
 	if not %RET% EQU 0 (
@@ -734,7 +754,11 @@ REM
 :FUNC-MENU-LAUNCH-SOLR-INFO-PAGE
 	setlocal
 	if defined TRACE %TRACE% [proc :FUNC-MENU-LAUNCH-SOLR-INFO-PAGE]
+
 	echo.
+	echo Launching Solr info web page ...
+	echo.
+	
 	if defined TRACE %TRACE% [Running start %IE_EXE% %DOCSEARCH_SOLR_DIR%\index.html ...]
                                       start %IE_EXE% %DOCSEARCH_SOLR_DIR%\index.html
 	if defined TRACE %TRACE% [proc :FUNC-MENU-LAUNCH-SOLR-INFO-PAGE return]
@@ -749,7 +773,11 @@ REM
 :FUNC-MENU-LAUNCH-MANIFOLD-INFO-PAGE
 	setlocal
 	if defined TRACE %TRACE% [proc :FUNC-MENU-LAUNCH-MANIFOLD-INFO-PAGE]
+
 	echo.
+	echo Launching ManifoldCF info web page ...
+	echo.
+		
 	if defined TRACE %TRACE% [Running start %IE_EXE% %DOCSEARCH_MANIFOLD_DIR%\index.html ...]
                                       start %IE_EXE% %DOCSEARCH_MANIFOLD_DIR%\index.html
 	if defined TRACE %TRACE% [proc :FUNC-MENU-LAUNCH-MANIFOLD-INFO-PAGE return]
@@ -764,7 +792,11 @@ REM
 :FUNC-MENU-LAUNCH-MANIFOLD-UI
 	setlocal
 	if defined TRACE %TRACE% [proc :FUNC-MENU-LAUNCH-MANIFOLD-UI]
+
 	echo.
+	echo Launching ManifoldCF UI http://localhost:8345/mcf-crawler-ui ...
+	echo.
+	
 	if defined TRACE %TRACE% [Running start %IE_EXE% http://localhost:8345/mcf-crawler-ui ...]
                                       start %IE_EXE% http://localhost:8345/mcf-crawler-ui
 	if defined TRACE %TRACE% [proc :FUNC-MENU-LAUNCH-MANIFOLD-UI return]
