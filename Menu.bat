@@ -92,13 +92,15 @@ REM
 	
 	echo     1.  Perform a Search
 	echo     --------------------------------------
-	echo     2.  Stop Solr
+	echo     2.  Start Solr
 	echo     --------------------------------------
-	echo     3.  Manage Solr
+	echo     3.  Stop Solr
 	echo     --------------------------------------
-	echo     4.  Manage Manifold
+	echo     4.  Manage Solr
 	echo     --------------------------------------
-	echo     5.  Installation
+	echo     5.  Manage Manifold
+	echo     --------------------------------------
+	echo     6.  Installation
 	echo     --------------------------------------
 	echo     Q.  Quit
 	echo     --------------------------------------
@@ -108,10 +110,11 @@ REM
 	set /p choice=Please select a number:
 	if not '%choice%'=='' set choice=%choice:~0,2%
 	if '%choice%'=='1'  (call :FUNC-MENU-SEARCH-CORE	 	& goto :MAIN-MENU-START)
-	if '%choice%'=='2'  (call :FUNC-MENU-STOP-SOLR			& goto :MAIN-MENU-START)
-	if '%choice%'=='3'  (call :FUNC-MENU-MANAGE-SOLR		& goto :MAIN-MENU-START)
-	if '%choice%'=='4'  (call :FUNC-MENU-MANAGE-MANIFOLD	& goto :MAIN-MENU-START)
-	if '%choice%'=='5'  (call :FUNC-MENU-INSTALLATION		& goto :MAIN-MENU-START)
+	if '%choice%'=='2'  (call :FUNC-MENU-START-SOLR			& goto :MAIN-MENU-START)
+	if '%choice%'=='3'  (call :FUNC-MENU-STOP-SOLR			& goto :MAIN-MENU-START)
+	if '%choice%'=='4'  (call :FUNC-MENU-MANAGE-SOLR		& goto :MAIN-MENU-START)
+	if '%choice%'=='5'  (call :FUNC-MENU-MANAGE-MANIFOLD	& goto :MAIN-MENU-START)
+	if '%choice%'=='6'  (call :FUNC-MENU-INSTALLATION		& goto :MAIN-MENU-START)
 	if '%choice%'=='Q'  (goto :EXIT-MAIN-MENU)
 	if '%choice%'=='q'  (goto :EXIT-MAIN-MENU)
 	if '%choice%'==''	(goto :MAIN-MENU-START)
