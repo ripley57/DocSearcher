@@ -172,8 +172,13 @@ REM
 		goto :EXIT-FUNC-SOLR-CREATE-CORE
 	)
 	
-	REM Inatall homemade configset if required.
-	if not "%configset%"=="_default" (
+	REM If the user specifies a configset that is not a built-in one, then it
+	REM must be a "homemade" one, and so we need to unzip it into the Solr 
+	REM installation directory, so it is available to the create core command.
+	set is_builtin_configset=no
+	if "%configset%"=="_default"					(set is_builtin_configset=yes)
+	if "%configset%"=="sample_techproducts_configs" (set is_builtin_configset=yes)
+	if "%is_builtin_configset%"=="no" (
 		REM Check if the chosen configset directory already exists in the Solr 
 		REM configsets directory. If it's not there, and it's one of our ownhomemade
 		REM homemade ones, extract our homemade configset zip to the Solr configsets dir.
