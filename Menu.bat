@@ -158,21 +158,21 @@ REM
 	echo     -------------------------------------------
 	echo     5.  Create a new Solr core
 	echo     -------------------------------------------
-	echo     6.  Create "Solr_Demo" core and import docs
+	echo     6.  Delete a Solr core
 	echo     -------------------------------------------
-	echo     7.  Delete a Solr core
+	echo     7.  Clear Lucene index of a Solr core
 	echo     -------------------------------------------
-	echo     8.  Clear Lucene index of a Solr core
+	echo     8.  Create Solr_Demo core with sample docs
 	echo     -------------------------------------------
-	echo     9.  Disable a Solr core
+	rem echo 9.  Disable a Solr core
+	rem echo -------------------------------------------
+	rem echo 10. Enable a Solr core
+	rem echo  -------------------------------------------
+	echo     9.  Import sample docs into a Solr core
 	echo     -------------------------------------------
-	echo     10. Enable a Solr core
+	echo     10. Launch Solr info page
 	echo     -------------------------------------------
-	echo     11. Import test docs into a Solr core
-	echo     -------------------------------------------
-	echo     12. Solr useful info page
-	echo     -------------------------------------------
-	echo     13. Tail the Solr log
+	echo     11. Tail Solr log
 	echo     -------------------------------------------
 	echo     Q.  Quit
 	echo     -------------------------------------------
@@ -186,14 +186,14 @@ REM
 	if '%choice%'=='3'  (call :FUNC-MENU-RESTART-SOLR					& goto :MENU-MANAGE-SOLR-START)
 	if '%choice%'=='4'  (call :FUNC-MENU-LIST-CORES 					& goto :MENU-MANAGE-SOLR-START)
 	if '%choice%'=='5'  (call :FUNC-MENU-CREATE-CORE					& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='6'  (call :FUNC-MENU-CREATE-SOLR-DEMO				& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='7'  (call :FUNC-MENU-DELETE-CORE					& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='8'  (call :FUNC-MENU-CLEAR-INDEX					& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='9'  (call :FUNC-MENU-DISABLE-CORE					& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='10' (call :FUNC-MENU-ENABLE-CORE					& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='11' (call :FUNC-MENU-IMPORT-TEST-DOCS-INTO-INDEX	& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='12' (call :FUNC-MENU-LAUNCH-SOLR-INFO-PAGE			& goto :MENU-MANAGE-SOLR-START)
-	if '%choice%'=='13' (call :FUNC-MENU-TAIL-SOLR-LOG					& goto :MENU-MANAGE-SOLR-START)
+	if '%choice%'=='6'  (call :FUNC-MENU-DELETE-CORE					& goto :MENU-MANAGE-SOLR-START)
+	if '%choice%'=='7'  (call :FUNC-MENU-CLEAR-INDEX					& goto :MENU-MANAGE-SOLR-START)
+	if '%choice%'=='8'  (call :FUNC-MENU-CREATE-SOLR-DEMO				& goto :MENU-MANAGE-SOLR-START)
+rem if '%choice%'=='9'  (call :FUNC-MENU-DISABLE-CORE					& goto :MENU-MANAGE-SOLR-START)
+rem if '%choice%'=='10' (call :FUNC-MENU-ENABLE-CORE					& goto :MENU-MANAGE-SOLR-START)
+	if '%choice%'=='9'  (call :FUNC-MENU-IMPORT-TEST-DOCS-INTO-INDEX	& goto :MENU-MANAGE-SOLR-START)
+	if '%choice%'=='10' (call :FUNC-MENU-LAUNCH-SOLR-INFO-PAGE			& goto :MENU-MANAGE-SOLR-START)
+	if '%choice%'=='11' (call :FUNC-MENU-TAIL-SOLR-LOG					& goto :MENU-MANAGE-SOLR-START)
 	if '%choice%'=='Q'  (goto :EXIT-MENU-MANAGE-SOLR)
 	if '%choice%'=='q'  (goto :EXIT-MENU-MANAGE-SOLR)
 	if '%choice%'==''	(goto :MENU-MANAGE-SOLR-START)
@@ -989,7 +989,12 @@ REM
 	
 	if defined TRACE %TRACE% [Running call %DOCSEARCH_UTILS_LIB% :FUNC-UTILS-TAIL-FILE %DOCSEARCH_SOLR_LOGS_DIR%\solr.log ...]
 	                                  call %DOCSEARCH_UTILS_LIB% :FUNC-UTILS-TAIL-FILE %DOCSEARCH_SOLR_LOGS_DIR%\solr.log
-
+	if not %RET% EQU 0 (
+		echo.
+		echo ERROR: %FUNC-UTILS-TAIL-FILE_ERROR_TEXT%
+		echo.
+	)
+									  
 	if defined TRACE %TRACE% [proc :FUNC-MENU-TAIL-SOLR-LOG return]
 	echo.
 	pause

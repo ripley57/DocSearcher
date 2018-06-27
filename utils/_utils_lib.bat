@@ -115,20 +115,29 @@ REM ////////////////////////////////////////////////////////////////////
 REM FUNC-UTILS-TAIL-FILE
 REM Tail the specified log file.
 REM
+REM Returns: 0 if successful; otherwise >0.
+REM
 :FUNC-UTILS-TAIL-FILE
 	setlocal
 	if defined TRACE %TRACE% [proc :FUNC-UTILS-TAIL-FILE]
 
 	set pwd=%~dp0
 	set filepath=%1
+	set FUNC-UTILS-TAIL-FILE_ERROR_TEXT=
 	set RET=0
 	
 	REM Perform the tail.
+	if not exist %filepath% (
+		set FUNC-UTILS-TAIL-FILE_ERROR_TEXT=No such file: %filepath%
+		set RET=1
+		goto :EXIT-FUNC-UTILS-TAIL-FILE
+	)
+	
 	start %DOCSEARCH_UTILS_DIR%\tail.exe -f %filepath%
 		
 	:EXIT-FUNC-UTILS-TAIL-FILE
-	if defined TRACE %TRACE% [proc :FUNC-UTILS-TAIL-FILE]
-	endlocal & set RET=%RET%
+	if defined TRACE %TRACE% [proc :FUNC-UTILS-TAIL-FILE return {%RET%} {%FUNC-UTILS-TAIL-FILE_ERROR_TEXT%}]
+	endlocal & set RET=%RET%& set FUNC-UTILS-TAIL-FILE_ERROR_TEXT=%FUNC-UTILS-TAIL-FILE_ERROR_TEXT%
 	goto :eof
 
 
