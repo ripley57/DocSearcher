@@ -11,7 +11,9 @@
 ![DocSearcher Main menu](https://bit.ly/2KwkRu3 "Figure 1")
 #### Using this menu your first action will be to install the versions of Solr, ManifoldCF and Java that DocSearcher needs. These are all installed into sub-directories of the current directory. To keep the DocSearcher Github repository as small as possible, I didn't want to include copies of Solr and ManifoldCF, so instead I tried to make it as painless as possible to download and install them. 
 
-#### With Java and Solr installed, you can use Menu.bat to start-up Solr, create a Solr core, and inject some sample data into it. You can then perform searches of the core. After you get bored playing with the same data, and you want to start indexing your own filesystem directories, this is when you need to start-up ManifoldCF, to configure a "Repository Connection" (the filesystem directory), an "Output Connection" (Solr), and a ManifolfCF "Job" that combines the two.
+#### With Java and Solr installed, you can use Menu.bat to start-up Solr, create a Solr core, and inject some sample data into it. You can then perform searches of the core (Figure 2).  
+![Searching the sample documents](https://bit.ly/2tVuckK "Figure 2")  
+####After you get bored playing with the same data, and you want to start indexing your own filesystem directories, this is when you need to start-up ManifoldCF, to configure a "Repository Connection" (the filesystem directory), an "Output Connection" (Solr), and a ManifolfCF "Job" that combines the two.
 
 # DOCSEARCHER DEMONSTRATION VIDEOS
 * Downloading DocSearcher and launching the DocSearcher Main menu.
