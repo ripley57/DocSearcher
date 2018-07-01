@@ -12,8 +12,9 @@ REM JeremyC 27-6-2018
 
 setlocal
 
-if exist C:\TEMP\rununix2dos.marker (goto :end)
+set pwd=%~dp0
 
+if exist %pwd%\rununix2dos.marker (goto :end)
 echo.
 echo Running unix2dos.exe on the batch scripts ...
 echo.
@@ -21,15 +22,12 @@ echo.
 set pwd=%~dp0
 pushd %pwd%
 pushd .. 
-
 for /r %%A in (*.bat) do (
 	utils\unix2dos.exe %%A >nul 2>&1
 )
-
 popd
 popd
-
-echo %DATE% %TIME% > C:\TEMP\rununix2dos.marker
+echo %DATE% %TIME% > %pwd%\rununix2dos.marker
 
 :end
 endlocal
