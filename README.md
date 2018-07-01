@@ -14,8 +14,7 @@
 #### With Java and Solr installed, you can use Menu.bat to start-up Solr, create a Solr core, and inject some sample data into it. You can then perform searches of the core. After you get bored playing with the same data, and you want to start indexing your own filesystem directories, this is when you need to start-up ManifoldCF, to configure a "Repository Connection" (the filesystem directory), an "Output Connection" (Solr), and a ManifolfCF "Job" that combines the two.
 
 # DOCSEARCHER DEMONSTRATION VIDEOS
-* Downloading DocSearcher.
-* Launching the DocSearcher Main menu.
+* Downloading DocSearcher and launching the DocSearcher Main menu.
 * Installing Java.
 * Installing Solr.
 * Installing ManifoldCF.
