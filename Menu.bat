@@ -14,9 +14,17 @@ setlocal & pushd & set RET=
 	set pwd=%~dp0
 	set SCRIPTNAME=%~nx0
 	set SCRIPTPATH=%~f0
-	REM To enable tracing, set DEBUG=1.
+
+	REM To enable tracing, set DEBUG=1, e.g. 
+	REM set DEBUG=1& Menu.bat
+	REM Note: No space before "&"!
 	if "%DEBUG%"=="1" (set TRACE=echo) else (set TRACE=rem)
-	cmd /c %pwd%\scripts\rununix2dos.bat
+
+	REM We no longer need to call this, because we've added "* binary" to a 
+	REM new .gitattributes file, added the file to the repository, and manually 
+	REM corrected the batch scripts back to CRLF line endings, using unix2dos.
+	REM cmd /c %pwd%\scripts\rununix2dos.bat
+
 	call _docsearch_lib :INIT
 	call :MAIN %*
 popd & endlocal & set RET=%RET%
