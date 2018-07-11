@@ -6,7 +6,7 @@
 # This is a good default option for users who don't have core.autocrlf set.
 # If the text attribute is unspecified, Git uses the core.autocrlf 
 # configuration variable to determine if the file should be converted.
-# (see the "git config" command).
+# (see "core.autocrlf" and the "git config" command).
 *	text=auto
 
 # Normalize .bat files but ensure CRLF line endings on checkout.
