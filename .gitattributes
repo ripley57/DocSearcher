@@ -19,7 +19,9 @@
 download_docsearcher.bat  -text
 
 # Use the "macro" attribute "binary" to prevent any end-of-line 
-# conversions or textual diffs.
+# conversions or textual diffs. According to 
+# https://git-scm.com/docs/gitattributes, this is equivalent to
+# "*.jpg -text -diff".
 *.jpg binary
 *.png binary
 
