@@ -1,2 +1,36 @@
-# Perform no line ending conversions.
-* binary
+# From https://git-scm.com/docs/gitattributes:
+# Automatic end-of-line conversion. If Git decides that the content is text, 
+# its line endings are converted to LF on checkin. When the file has been 
+# committed with CRLF, no conversion is done.
+# Note: Converting to LF is known as "normalizing the file".
+# This is a good default option for users who don't have core.autocrlf set.
+# If the text attribute is unspecified, Git uses the core.autocrlf 
+# configuration variable to determine if the file should be converted.
+# (see the "git config" command).
+*	text=auto
+
+# Normalize .bat files but ensure CRLF line endings on checkout.
+*.bat text eol=crlf
+
+# Normalise .sh files but ensure LF line endings on checkout.
+*.sh text eol=lf
+
+# Do not attempt any end-of-line conversion upon checkin or checkout.
+download_docsearcher.bat  -text
+
+# Use the "macro" attribute "binary" to prevent any end-of-line 
+# conversions or textual diffs.
+*.jpg binary
+*.png binary
+
+# Note: After changing .gitattributes we should do this:
+#
+# git add --renormalize .
+# git status        # Show files that will be normalized
+# git commit -m "Introduce end-of-line normalization"
+# 
+# To prevent a specific file from being normalized:
+# manual.pdf	-text   # Then run "git add -u"
+#
+# To request that a specific file be normalized:
+# weirdchars.txt	text  # Then run "git add -u"
