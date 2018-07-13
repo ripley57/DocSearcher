@@ -1,83 +1,94 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Manifold info page</title>
-		<link rel="stylesheet" type="text/css" href="../css/styles.css"/>
+    	<title>Manifold info page</title>
+	<link rel="stylesheet" type="text/css" href="../css/styles.css"/>
   </head>
   <body>
-    <h1>Manifold info page</h1>
+    	<h1>Manifold info page</h1>
 
 	<br/>
 	<h3>Manifold UI</h3>
-    <table border="1">
-      <tr>
-        <td><a href="http://localhost:8345/mcf-crawler-ui" target="_MANIFOLDCF">http://localhost:8345/mcf-crawler-ui</a>&nbsp;(<strong>username/password = admin/admin</strong>)</td>
-      </tr>
-    </table>
+    	<table border="1">
+      	<tr>
+        	<td><a href="http://localhost:8345/mcf-crawler-ui" target="_MANIFOLDCF">http://localhost:8345/mcf-crawler-ui</a>&nbsp;(<strong>username/password = admin/admin</strong>)</td>
+      	</tr>
+    	</table>
 	
 	<br/>
 	<h3>Indexing changes to existing documents, indexing new documents, and handling removed documents</h3>
-    <table border="1">
-	   <tr>
+    	<table border="1">
+	<tr>
 		<th>Button on "Status and Job Management" page</th>
 		<th>What new content is indexed</th>
-	   </tr>
-	  <tr>
+	</tr>
+	<tr>
 		<td align="left"><b>Start minimal</b></td>
 		<td align="left">Indexes new files.<br/>
 		Indexes updates to existing files (but not filename changes - a renamed file will be added as a new file).</td>
-	  </tr>
-  	  <tr>
+	</tr>
+  	<tr>
 		<td align="left"><b>Start</b></td>
 		<td align="left">Indexes renamed files.<br/>
 		Indexes deleted files (i.e. they are removed from the index).</td>
-	  </tr>
-	 </table>    
+	</tr>
+	</table>    
 	 
-	 <br/>
-	 <h3>Not commonly used indexing options (according to <i>ManifoldCF In Action</i> book)</h3>
-	 <table border="1">
-	   <tr>
+	<br/>
+	<h3>Not commonly used indexing options (according to <i>ManifoldCF In Action</i> book)</h3>
+	<table border="1">
+	<tr>
 		<th width="30%">Button on individual Output Connection page</th>
 		<th>Description, from <i>Manifold In Action</i> book</th>
-	   </tr>
-	  <tr>
+	</tr>
+	<tr>
 		<td align="left"><b>Re-index all associated documents</b></td>
 		<td align="left"><i>Make ManifoldCF re-index all documents that were previously indexed, when the associated jobs are run the next time. You would need to click this button only if you had changed the configuration on the target system - perhaps, for example, changing what metadata fields exist.</i></td>
-	  </tr>
-  	  <tr>
+	</tr>
+  	<tr>
 		<td align="left"><b>Remove all associated records</b></td>
 		<td align="left"><i>Somewhat similar to "Re-index all associated documents", but would be appropriate if you had completely deleted the index on the target system and wanted to start over. These buttons are helpful mainly in a development situation, and should be used with caution in a production system.</i></td>
-	  </tr>
-	 </table>
+	</tr>
+	</table>
+
+	<br/>
+	<h3>Q & A</h3>
+	<table border="1">
+	<tr>
+		<th>Q</th>
+		<th>A</th>
+	</tr>
+	<tr>
+		<td align="left">I'm running a filesystem crawl Job in ManifoldCF, but it won't process all the documents. The "Active" count value remains at a non-zero value, and tailing the Solr log shows repeated extraction errors. Also, none of the successfully-processed documents appear to be searchable in Solr. What's happening and what can I do?</td>
+		<td align="left">Solr is erroring when extracting the content from some documents, and ManifoldCF is repeatedly sending the documents back to Solr to be indexed. This is because ManifoldCF is not interpreting the error code from Solr as a fatal failure (or potentially Solr might be returning an incorrect failure code). To get around this, click "Abort" for the Job in ManifoldCF. The erroring documents will remain unprocessed, but those already successfully sent to Solr should now be searchable.</td>
+	</tr>
+	</table>
 		
 	<br/>
 	<h3>Documentation</h3>
-    <table border="1">
-	   <tr>
-        <th align="left">Manifold In Action</th>
-        <td><a href="docs/ManifoldInAction" target="_MANIFOLDCF">docs/ManifoldInAction/Chapters</a></td>
-      </tr>
-
-	   <tr>
-        <th align="left">Manifold In Action (same book online)</th>
-        <td><a href="https://github.com/DaddyWri/manifoldcfinaction" target="_MANIFOLDCF"> https://github.com/DaddyWri/manifoldcfinaction</a></td>
-      </tr>
-
-      <tr>
-        <th align="left">ManifoldCF Product Documentation</th>
-        <td><a href="apache-manifoldcf-1.9/doc/index.html" target="_MANIFOLDCF">apache-manifoldcf-1.9/doc/index.html</a></td>
-      </tr>
-	 </table>
+    	<table border="1">
+	<tr>
+        	<th align="left">Manifold In Action</th>
+        	<td><a href="docs/ManifoldInAction" target="_MANIFOLDCF">docs/ManifoldInAction/Chapters</a></td>
+      	</tr>
+	<tr>
+        	<th align="left">Manifold In Action (same book online)</th>
+        	<td><a href="https://github.com/DaddyWri/manifoldcfinaction" target="_MANIFOLDCF"> https://github.com/DaddyWri/manifoldcfinaction</a></td>
+      	</tr>
+      	<tr>
+        	<th align="left">ManifoldCF Product Documentation</th>
+        	<td><a href="apache-manifoldcf-1.9/doc/index.html" target="_MANIFOLDCF">apache-manifoldcf-1.9/doc/index.html</a></td>
+      	</tr>
+	</table>
 	 <p><strong>Note:</strong> The first few chapters of the <i>Manifold In Action</i> book include some very good basic examples of how to configure and use ManifoldCF. However, due to changes in the ManifoldCF UI, the steps only appear to be correct for older versions (including version 1.9).</p>
 	 
 	<br/>
 	<h3>Downloads</h3>
-    <table border="1">
-	  <tr>
-        <th align="left">ManifoldCF 1.9</th>
-        <td><a href="http://archive.apache.org/dist/manifoldcf/apache-manifoldcf-1.9/apache-manifoldcf-1.9-bin.zip" target="_MANIFOLDCF">http://archive.apache.org/dist/manifoldcf/apache-manifoldcf-1.9/apache-manifoldcf-1.9-bin.zip</a></td>
-      </tr>
-	 </table>
+    	<table border="1">
+	<tr>
+        	<th align="left">ManifoldCF 1.9</th>
+        	<td><a href="http://archive.apache.org/dist/manifoldcf/apache-manifoldcf-1.9/apache-manifoldcf-1.9-bin.zip" target="_MANIFOLDCF">http://archive.apache.org/dist/manifoldcf/apache-manifoldcf-1.9/apache-manifoldcf-1.9-bin.zip</a></td>
+      	</tr>
+	</table>
   </body>
 </html>
