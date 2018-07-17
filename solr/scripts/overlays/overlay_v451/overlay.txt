@@ -1,7 +1,0 @@
-overlays\overlays_v451\solrconfig.xml.overlay.v451#_SOLR_DIR_\example\solr\_CORE_\conf\solrconfig.xml
-overlays\overlays_v451\footer.vm.overlay.v451#_SOLR_DIR_\example\solr\_CORE_\conf\velocity\footer.vm
-overlays\overlays_v451\facets.vm.overlay.v451#_SOLR_DIR_\example\solr\_CORE_\conf\velocity\facets.vm
-overlays\overlays_v451\main.css.overlay.v451#_SOLR_DIR_\example\solr\_CORE_\conf\velocity\main.css
-overlays\overlays_v451\tabs.vm.overlay.v451#_SOLR_DIR_\example\solr\_CORE_\conf\velocity\tabs.vm
-overlays\overlays_v451\richtext_doc.vm.overlay.v451#_SOLR_DIR_\example\_CORE_\conf\velocity\richtext_doc.vm
-ovelays\overlays_v451\solr-velocity-4.5.1-SNAPSHOT.jar#_SOLR_DIR_\dist\solr-velocity-4.5.1.jar
