@@ -99,6 +99,13 @@ REM
 	set pwd=%~dp0
 	set FUNC-SOLR-START_ERROR_TEXT=
 	set RET=1
+
+	REM Install Solr overlay files, if not already applied.
+	call :FUNC-SOLR-INSTALL-OVERLAY
+	if not %RET% EQU 0 (
+	 	set FUNC-SOLR-START_ERROR_TEXT=ERROR: %FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT%
+		goto :EXIT-FUNC-SOLR-START
+	)
 	
 	REM Start Solr.
 	cmd /C %DOCSEARCH_SOLR_BIN_DIR%\bin\solr.cmd start

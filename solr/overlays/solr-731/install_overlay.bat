@@ -45,8 +45,8 @@ REM
 		copy %pwd%\solr-velocity-7.3.1.jar %_solr_install_dir%\dist\solr-velocity-7.3.1.jar 2>&1 >nul
 
 		REM Add missing search result document type icons which are based on file extension.
-		copy %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\doc.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\docx.png
-		copy %_solr_install_dir%\server\solr-webapp\webapp\img\ico\mail.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\msg.png
+		copy %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\doc.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\docx.png 2>&1 >nul
+		copy %_solr_install_dir%\server\solr-webapp\webapp\img\ico\mail.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\msg.png 2>&1 >nul
 	)
 	
 :END_MAIN
