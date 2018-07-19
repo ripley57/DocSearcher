@@ -8,7 +8,7 @@
 # configuration variable to determine if the file should be converted.
 # (see "core.autocrlf" and the "git config" command: 
 # https://github.com/ripley57/CW_Tools/blob/master/tools/git/git_config.txt).
-*	text=auto
+#* text=auto
 
 # Normalize .bat files but ensure CRLF line endings on checkout.
 *.bat text eol=crlf
