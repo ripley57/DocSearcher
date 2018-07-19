@@ -58,7 +58,13 @@ REM
 		echo ERROR: %FUNC-SOLR-INSTALL-APPURL_ERROR_TEXT%
 		goto :eof
 	)
-	 
+	
+	call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-INSTALL-OVERLAY
+	if not %RET% EQU 0 (
+	 	echo ERROR: %FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT%
+		goto :eof
+	)
+	
 	call :FUNC-DISPLAY-MAIN-MENU
 	
 	if defined TRACE %TRACE% [proc :MAIN return]

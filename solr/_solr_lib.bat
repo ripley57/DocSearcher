@@ -39,6 +39,7 @@ REM
 	set DOCSEARCH_SOLR_CONFIGSET_DIR=%topdir%solr\solr-7.3.1\server\solr\configsets
 	set DOCSEARCH_SOLR_MY_CONFIGSET_DIR=%topdir%solr\myconfigsets
 	set DOCSEARCH_SOLR_LOGS_DIR=%topdir%solr\solr-7.3.1\server\logs
+	set DOCSEARCH_SOLR_OVERLAY_SCRIPT=%topdir%solr\overlays\solr-731\install_overlay.bat
 	
 	
 	REM Download Solr from here.
@@ -667,5 +668,40 @@ REM
 	endlocal & set RET=%RET%
 	goto :eof	
 	
+	
+REM ////////////////////////////////////////////////////////////////////
+REM FUNC-SOLR-INSTALL-OVERLAY
+REM
+REM Returns: Nothing.
+REM
+:FUNC-SOLR-INSTALL-OVERLAY
+	setlocal
+	if defined TRACE %TRACE% [proc :FUNC-SOLR-INSTALL-OVERLAY]
+	set FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT=
+	set RET=1
+	
+	if not exist %DOCSEARCH_SOLR_OVERLAY_SCRIPT% (
+		set FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT=Script not found: %DOCSEARCH_SOLR_OVERLAY_SCRIPT%
+		goto :EXIT-FUNC-SOLR-INSTALL-OVERLAY
+	)
+	
+	if not exist %DOCSEARCH_SOLR_BIN_DIR% (
+		set FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT=Solr not yet installed in %DOCSEARCH_SOLR_BIN_DIR%
+		REM Non-fatal error.
+		set RET=0
+		goto :EXIT-FUNC-SOLR-INSTALL-OVERLAY
+	)
+	
+	REM start /b runs a script inside the main script (Menu.bat), so we 
+	REM should not display any output in the script we are about to run.
+    	start /b cmd /c %DOCSEARCH_SOLR_OVERLAY_SCRIPT% %DOCSEARCH_SOLR_BIN_DIR%
+	REM Assume success.
+	set RET=0
+	
+	:EXIT-FUNC-SOLR-INSTALL-OVERLAY
+	if defined TRACE %TRACE% [proc :FUNC-SOLR-INSTALL-OVERLAY return {%RET%}]
+	endlocal & set RET=%RET%& set FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT=%FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT%
+	goto :eof	
+
 	
 REM ///////////// END OF SCRIPT ///////////////
