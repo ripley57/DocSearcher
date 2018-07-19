@@ -39,10 +39,14 @@ REM
 		goto :END_MAIN
 	)
 	
-	REM Overlay rebuilt solr-velocity jar with LinkTool support.
 	if not exist %_solr_install_dir%\dist\solr-velocity-7.3.1.jar.before_overlay (
+		REM Install our rebuilt solr-velocity jar with LinkTool support.
 		rename %_solr_install_dir%\dist\solr-velocity-7.3.1.jar solr-velocity-7.3.1.jar.before_overlay
 		copy %pwd%\solr-velocity-7.3.1.jar %_solr_install_dir%\dist\solr-velocity-7.3.1.jar 2>&1 >nul
+
+		REM Add missing search result document type icons which are based on file extension.
+		copy %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\doc.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\docx.png
+		copy %_solr_install_dir%\server\solr-webapp\webapp\img\ico\mail.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\msg.png
 	)
 	
 :END_MAIN
