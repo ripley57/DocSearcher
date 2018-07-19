@@ -20,10 +20,12 @@ setlocal & pushd & set RET=
 	REM Note: No space before "&"!
 	if "%DEBUG%"=="1" (set TRACE=echo) else (set TRACE=rem)
 
-	REM We no longer need to call this, because we've added "* binary" to a 
-	REM new .gitattributes file, added the file to the repository, and manually 
-	REM corrected the batch scripts back to CRLF line endings, using unix2dos.
-	REM cmd /c %pwd%\scripts\rununix2dos.bat
+	REM We still need to call this, because the git client we have embedded in
+	REM download_docsearcher.bat does not seem to honour the contents of file
+	REM .gitattributes. Embedding a new version of the jgit client jar might
+	REM fix this, but I don't have time to test this at the moment, plus I've
+	REM noticed that the size of jgit.jar has increased noticeably since then.
+	cmd /c %pwd%\scripts\rununix2dos.bat
 
 	call _docsearch_lib :INIT
 	call :MAIN %*
