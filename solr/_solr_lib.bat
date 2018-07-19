@@ -685,9 +685,16 @@ REM
 		goto :EXIT-FUNC-SOLR-INSTALL-OVERLAY
 	)
 	
+	if not exist %DOCSEARCH_SOLR_BIN_DIR% (
+		set FUNC-SOLR-INSTALL-OVERLAY_ERROR_TEXT=Solr not yet installed in %DOCSEARCH_SOLR_BIN_DIR%
+		REM Non-fatal error.
+		set RET=0
+		goto :EXIT-FUNC-SOLR-INSTALL-OVERLAY
+	)
+	
 	REM start /b runs a script inside the main script (Menu.bat), so we 
 	REM should not display any output in the script we are about to run.
-    start /b cmd /c %DOCSEARCH_SOLR_OVERLAY_SCRIPT% %DOCSEARCH_SOLR_BIN_DIR%
+    	start /b cmd /c %DOCSEARCH_SOLR_OVERLAY_SCRIPT% %DOCSEARCH_SOLR_BIN_DIR%
 	REM Assume success.
 	set RET=0
 	
