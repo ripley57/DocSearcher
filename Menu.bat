@@ -556,12 +556,11 @@ REM
 		set CORES_ARRAY_!cnt!_=%%A
 
 		REM Get state of the core.
-		call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-GET-CORE-STATE %%A
-		set core_state=!RET!
-		
-		REM Display each core choice.
-		echo     !cnt!.  %%A ^(!core_state!^)
-		echo     --------------------------------------
+		rem call %DOCSEARCH_SOLR_LIB% :FUNC-SOLR-GET-CORE-STATE %%A
+		rem set core_state=!RET!
+		rem echo     !cnt!.  %%A ^(!core_state!^)
+		echo     !cnt!.  %%A
+		echo     ---------------------------------
 	)
 	
 	if %cnt% EQU 0 (
