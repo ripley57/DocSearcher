@@ -32,7 +32,12 @@ echo JAVA_HOME=%JAVA_HOME%
 rem echo PATH=%PATH%
 echo.
 
-REM Install ant if not already installed.
+REM Install local java if not aready installed.
+if not exist "%JAVA_HOME%" (
+    call %pwd%\scripts\install.bat java >nul
+)
+
+REM Install local ant if not already installed.
 if not exist "%ANT_HOME%" (
     call %pwd%\scripts\install.bat ant >nul
 )
