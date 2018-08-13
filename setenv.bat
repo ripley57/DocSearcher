@@ -34,11 +34,13 @@ echo.
 
 REM Install local java if not aready installed.
 if not exist "%JAVA_HOME%" (
+    echo Installing Java. Please wait...
     call %pwd%\scripts\install.bat java >nul
 )
 
 REM Install local ant if not already installed.
 if not exist "%ANT_HOME%" (
+    echo Installing Ant. Please wait...
     call %pwd%\scripts\install.bat ant >nul
 )
 echo.
