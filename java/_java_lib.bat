@@ -35,7 +35,7 @@ REM
 	
 	
 	REM Download Java from here.
-	set DOCSEARCH_JAVA_DOWNLOAD_ZIP_URL=https://www.dropbox.com/s/6wp2r4952wkwwyl/jdk-8u74-windows-x64.zip
+	set DOCSEARCH_JAVA_DOWNLOAD_ZIP_URL=https://www.dropbox.com/s/td5mgzz4c862l7e/jdk-8u74-windows-x64.zip
 	set DOCSEARCH_JAVA_DOWNLOAD_ZIP_FILENAME=jdk-8u74-windows-x64.zip
 	
 	REM Keep downloads here.
