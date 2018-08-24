@@ -8,20 +8,11 @@
     <h1>Solr info page</h1>
 
 	<br/>
-	<h3>Solr Cores to Search</h3>
-    <table border="1">
-	  <tr>
-		<th align="left">Solr Core</th>
-		<th>Search UI</th>
-	  </tr>
-      <tr>
-        <th align="left">Collection1</th>
-        <td><a href="http://localhost:8983/solr/collection1/browse" target="_SOLR">http://localhost:8983/solr/Solr_Demo/browse</a></td>
-      </tr>
-	</table>
+	<h3>Searching a Solr Core:</h3>
+	<p>Format:&nbsp;&nbsp;<span style="font-family: 'Courier New', Courier, monospace">http://localhost:8983/solr/&lt;CORE-NAME&gt;/browse</span></p>
 	
 	<br/>
-	<h3>Solr Administration</h3>
+	<h3>Solr Administration:</h3>
     <table border="1">
       <tr>
         <th align="left">Solr Admin UI</th>
@@ -29,17 +20,74 @@
       </tr>
       <tr>
         <th align="left">Solr Luke UI</th>
-        <td><a href="http://localhost:8983/solr/admin/luke" target="_SOLR">http://localhost:8983/solr/admin/luke</a></td>
-      </tr>
-      <tr>
-        <td align="left" colspan="2"><b>Note:</b> To enable the Luke UI, add the following to the core's solrconfig.xml file (e.g. example/solr/collection1/conf/solrconfig.xml):<br/><br/>
-        &lt;requestHandler name="/admin/luke" class="org.apache.solr.handler.admin.LukeRequestHandler" /&gt;<br/><br/>
-        See <a href=" https://wiki.apache.org/solr/LukeRequestHandler" target="_SOLR"> https://wiki.apache.org/solr/LukeRequestHandler</a></td>
+		<td>Format:&nbsp;&nbsp;<span style="font-family: 'Courier New', Courier, monospace">http://localhost:8983/solr/&lt;CORE-NAME&gt;/admin/luke?show=schema&wt=json</span>
+		<br/><br/>
+        To enable the Solr Luke UI, the following needs to be added to the Solr core's "solrconfig.xml" file (e.g. example/solr/collection1/conf/solrconfig.xml):<br/>
+        <span style="font-family: 'Courier New', Courier, monospace">&lt;requestHandler name="/admin/luke" class="org.apache.solr.handler.admin.LukeRequestHandler" /&gt;</span><br/>
+        (See <a href=" https://wiki.apache.org/solr/LukeRequestHandler" target="_SOLR"> https://wiki.apache.org/solr/LukeRequestHandler)</a>
+		<br/><br/>
+		<b>Note:</b> If you are using a Solr core that was created using the "my-configset-solr-731" ConfigSet, then the Solr search UI will include a "schema" link to load the Luke UI.
+		</td>
       </tr>
     </table>
 	
 	<br/>
-	<h3>Solr Documentation</h3>
+	<h3>Q & A:</h3>
+	<table border="1">
+	<tr>
+		<th>Q</th>
+		<th>A</th>
+	</tr>
+	<tr>
+		<td align="left">What Lucene search fields are available?</td>
+		<td align="left">The search fields are defined in the "managed-schema" file in the ConfigSet, so they will end up in core's config files, e.g.:<br/>
+		<span style="font-family: 'Courier New', Courier, monospace">D:\ds\DocSearcher\solr\solr-7.3.1\server\solr\core_Sampledocs\conf\managed-schema</span><br/><br/>
+		You can use the "schema" link available from the Solr search UI to see the Luke configuration. However, it is easier to use the Luke standalone application, e.g.:<br>
+		<img src="images\Luke1.png"/><br/>
+	    <b>Note:</b>&nbsp;If it looks like not all of the fields are being displayed, it could be that the last field displayed has a value value. Use the scrollbar on the right to scroll-down the fields.
+		</td>
+	</tr>
+	<tr>
+		<td align="left">What is the default Lucene search field used by "my-configset-solr-731" ConfigSet?</td>
+		<td align="left">The "my-configset-solr-731" ConfigSet uses the "text" field.<br/><br/>
+		The default field of <b>text</b> is defined in the "solrconfig.xml" file in the ConfigSet:<br/>
+		<pre>
+&lt;requestHandler name="/query" class="solr.SearchHandler"&gt;
+	&lt;lst name="defaults"&gt;
+	&lt;str name="echoParams"&gt;explicit&lt;/str&gt;
+	&lt;str name="wt"&gt;json&lt;/str&gt;
+	&lt;str name="indent"&gt;true&lt;/str&gt;
+	&lt;str name="df"&gt;text&lt;/str&gt;
+	&lt;/lst>
+&lt;/requestHandler&gt;
+		</pre>
+		<b>Note:</b>&nbsp;This is a <b>catch-all</b> field, comprised of copies of pretty much all of the other fields.<br/>
+		Examine the "managed-schema" file to see which fields are "copied" to the "text" field, e.g.:<br/>
+		<pre>
+&lt;copyField source="title" dest="text"/&gt;
+&lt;copyField source="author" dest="text"/&gt;
+&lt;copyField source="description" dest="text"/&gt;
+&lt;copyField source="keywords" dest="text"/&gt;
+&lt;copyField source="content" dest="text"/&gt;
+		</pre>
+		</td>
+	</tr>
+	<tr>
+		<td align="left">Are email attachments indexed automatically?</td>
+		<td align="left">Yes</td>
+	</tr>
+		<tr>
+		<td align="left">How do I search by filename or email subject?</td>
+		<td align="left">
+		Searching by email subject:&nbsp;&nbsp;<span style="font-family: 'Courier New', Courier, monospace">subject:"check this out"</span>
+		<br/>
+		Searching by filename:&nbsp;&nbsp;<span style="font-family: 'Courier New', Courier, monospace">resourcename:test_pdf_document*</span>
+		</td>
+	</tr>
+	</table>
+	
+	<br/>
+	<h3>Solr Documentation:</h3>
     <table border="1">
 	  <tr>
         <th align="left">Solr Product Documentation</th>
@@ -48,7 +96,7 @@
 	 </table>
 	 
 	 <br/>
-	<h3>Solr Downloads</h3>
+	<h3>Solr Downloads:</h3>
     <table border="1">
 	  <tr>
         <th align="left">Solr 7.3.1</th>
