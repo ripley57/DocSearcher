@@ -3,7 +3,7 @@
 
 REM Description:
 REM   Setup a Java working environment, by setting JAVA_HOME, ANT_HOME 
-REM   and updating PATH. Also add local "scripts" directory to the path.
+REM   and updating PATH. Also add local "utils" directory to the path.
 REM
 REM Usage:
 REM   setenv.bat
@@ -13,6 +13,8 @@ REM JeremyC 12-08-2018
 set pwd=%~dp0
 
 call %pwd%\_docsearch_lib :INIT
+
+set PATH="%DOCSEARCH_UTILS_DIR%";%PATH%
 
 echo.
 echo Configured Java environment:
