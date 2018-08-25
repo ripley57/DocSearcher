@@ -37,6 +37,9 @@ REM
 	call solr\_solr_lib.bat :INIT %topdir%
 	call manifold\_manifold_lib.bat :INIT %topdir%
 	call ant\_ant_lib.bat :INIT %topdir%
+
+	REM Add scripts directory to path.
+	set PATH="%DOCSEARCH_SCRIPTS_DIR%";%PATH%
 	
 	if defined TRACE %TRACE% [proc %* return]
 	goto :eof

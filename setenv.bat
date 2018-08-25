@@ -11,16 +11,8 @@ REM
 REM JeremyC 12-08-2018
 
 set pwd=%~dp0
-set SCRIPTNAME=%~nx0
-set SCRIPTPATH=%~f0
 
-REM To enable tracing, set DEBUG=1.
-if "%DEBUG%"=="1" (set TRACE=echo) else (set TRACE=rem)
-
-call %pwd%\ant\_ant_lib.bat :INIT "%pwd%"
-call %pwd%\java\_java_lib.bat :INIT "%pwd%"
-
-set PATH="%pwd%\scripts";%PATH%
+call %pwd%\_docsearch_lib :INIT
 
 echo.
 echo Configured Java environment:
