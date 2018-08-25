@@ -17,13 +17,8 @@ set SCRIPTPATH=%~f0
 REM To enable tracing, set DEBUG=1.
 if "%DEBUG%"=="1" (set TRACE=echo) else (set TRACE=rem)
 
-call %pwd%\ant\_ant_lib.bat :INIT
-call %pwd%\java\_java_lib.bat :INIT
-
-REM Make paths absolute.
-set ANT_HOME=%pwd%\%ANT_HOME%
-set JAVA_HOME=%pwd%\%JAVA_HOME%
-set PATH=%ANT_HOME%\bin;%PATH%
+call %pwd%\ant\_ant_lib.bat :INIT "%pwd%"
+call %pwd%\java\_java_lib.bat :INIT "%pwd%"
 
 echo.
 echo Configured Java environment:
