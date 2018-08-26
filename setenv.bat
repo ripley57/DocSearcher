@@ -2,18 +2,19 @@
 @if not "%ECHO%"=="" echo %ECHO%
 
 REM Description:
-REM   Setup a Java working environment, by setting JAVA_HOME, ANT_HOME 
-REM   and updating PATH. Also add local "utils" directory to the path.
+REM   Setup a Java working environment.
 REM
 REM Usage:
 REM   setenv.bat
 REM
-REM JeremyC 12-08-2018
+REM JeremyC 26-08-2018
 
 set pwd=%~dp0
 
+REM This configures all the environment variables.
 call %pwd%\_docsearch_lib :INIT
 
+REM Add the local utils dir to PATH.
 set PATH="%DOCSEARCH_UTILS_DIR%";%PATH%
 
 echo.
@@ -31,3 +32,8 @@ if not exist "%ANT_HOME%" (
     echo Installing Ant. Please wait...
     call %pwd%\scripts\install.bat ant >nul
 )
+
+where is ant
+where is javac
+where is luke
+
