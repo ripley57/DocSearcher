@@ -17,12 +17,6 @@ call %pwd%\_docsearch_lib :INIT
 REM Add the local utils dir to PATH.
 set PATH="%DOCSEARCH_UTILS_DIR%";%PATH%
 
-echo.
-echo Configured Java environment:
-echo JAVA_HOME=%JAVA_HOME%
-echo ANT_HOME=%ANT_HOME%
-echo.
-
 if not exist "%JAVA_HOME%" (
     echo Installing Java. Please wait...
     call %pwd%\scripts\install.bat java >nul
@@ -33,5 +27,13 @@ if not exist "%ANT_HOME%" (
     call %pwd%\scripts\install.bat ant >nul
 )
 
-where ant
-where javac
+echo.
+echo JAVA_HOME=%JAVA_HOME%
+echo ANT_HOME=%ANT_HOME%
+
+echo.
+java -version
+
+echo.
+ant -version
+
