@@ -25,10 +25,10 @@ REM ////////////////////////////////////////////////////////////////////
 REM MAIN procedure
 REM
 :MAIN
-	setlocal
+	setlocal ENABLEDELAYEDEXPANSION
 	if defined TRACE %TRACE% [proc :MAIN]
 
-	if "%DOCSEARCH_UTILS_DIR% == "" (
+	if [%DOCSEARCH_UTILS_DIR%]==[] (
 		echo You must run setenv.bat first.
 		goto :EXIT-MAIN
 	)
@@ -37,15 +37,15 @@ REM
 	set download_url="https://www.dropbox.com/s/le3ky5fzxpc60hb/lukeall-7.3.1.jar"
 	set downloaded_file="%DOCSEARCH_UTILS_DIR%\lukeall-7.3.1.jar"
     if not exist %downloaded_file% (
-        call :FUNC-UTILS-DOWNLOAD-FILE "%DOCSEARCH_UTILS_DIR%" "lukeall-7.3.1.jar"
+	    call "%DOCSEARCH_UTILS_DIR%\_utils_lib.bat" :FUNC-UTILS-DOWNLOAD-FILE "%download_url%" "%DOCSEARCH_UTILS_DIR%" "lukeall-7.3.1.jar"
         if not !RET! EQU 0 (
-           echo ERROR: %FUNC-UTILS-DOWNLOAD-FILE_ERROR_TEXT%
+		   echo ERROR: %FUNC-UTILS-DOWNLOAD-FILE_ERROR_TEXT%
            goto :EXIT-MAIN
         )
     )
 
 	REM Launch Luke.
-	java -jar "%DOSEARCH_UTILS_DIR%\lukeall-7.3.1.jar"
+	start java -jar "%DOCSEARCH_UTILS_DIR%\lukeall-7.3.1.jar"
 
 	:EXIT-MAIN
 	if defined TRACE %TRACE% [proc :MAIN return]
