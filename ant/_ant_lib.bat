@@ -33,7 +33,6 @@ REM
 	set DOCSEARCH_ANT_DIR=%topdir%ant
 	set DOCSEARCH_ANT_LIB=%topdir%ant\_ant_lib.bat
 	
-	
 	REM Download Ant from here.
 	set DOCSEARCH_ANT_DOWNLOAD_ZIP_URL=https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip
 	set DOCSEARCH_ANT_DOWNLOAD_ZIP_FILENAME=apache-ant-1.10.1-bin.zip
@@ -47,8 +46,8 @@ REM
 	REM This is the directory we expect to see after extraction.
 	set DOCSEARCH_ANT_DOWNLOAD_ZIP_DIRNAME=%DOCSEARCH_ANT_DOWNLOAD_EXTRACT_TO_DIR%\apache-ant-1.10.1
 	
-	
 	set ANT_HOME=%topdir%ant\apache-ant-1.10.1
+	set PATH="%ANT_HOME%\bin";%PATH%
 	
 	if defined TRACE %TRACE% [proc :INIT returns]
 	goto :eof
