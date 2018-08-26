@@ -19,8 +19,8 @@ set PATH="%DOCSEARCH_UTILS_DIR%";%PATH%
 
 echo.
 echo Configured Java environment:
-echo ANT_HOME=%ANT_HOME%
 echo JAVA_HOME=%JAVA_HOME%
+echo ANT_HOME=%ANT_HOME%
 echo.
 
 if not exist "%JAVA_HOME%" (
@@ -33,7 +33,5 @@ if not exist "%ANT_HOME%" (
     call %pwd%\scripts\install.bat ant >nul
 )
 
-where is ant
-where is javac
-where is luke
-
+where ant
+where javac
