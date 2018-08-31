@@ -4,7 +4,7 @@
 #### With Solr and ManifoldCF being written in Java and hence platform agnostic, you might wonder why I didn't use a cross-platform language such as Java or Python, rather than using horrible old-style Windows batch scripts. My reason was simply that I wanted to see how difficult it would be to implement production-level code using Windows batch scripts.  
 
 # INSTALLING DOCSEARCHER
-#### The quickest way to install DocSearcher is to copy [download_docsearcher.bat](https://github.com/ripley57/DocSearcher/raw/master/download_docsearcher.bat) to your PC and run it. This script includes an embedded Java-based Git client, which will automatically download the DocSearcher Github repository. You will therefore need to have Java installed in order to use this installation method. 
+#### The quickest way to install DocSearcher is to copy [download_docsearcher.bat](https://github.com/ripley57/DocSearcher/raw/master/download_docsearcher.bat) to your PC and run it. This is actually a binary file, because it includes an embedded Java Git client, which will automatically download the DocSearcher Github repository. You will therefore need to have some Java installed in order to use this installation method. 
 
 # RUNNING DOCSEARCHER
 #### After the DocSearcher Github repository has been downloaded, simply run Menu.bat (Figure 1).  
