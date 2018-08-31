@@ -26,3 +26,4 @@
 * Running the ManifoldCF Job.
 * Searching the indexed sample documents in Solr.
 * Using the setenv.bat script to configure a command-line Java environment for any testing needs.
+* Using Luke to examine the Lucene index.
