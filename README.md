@@ -17,7 +17,7 @@
 
 # DOCSEARCHER DEMONSTRATION VIDEOS
 * Downloading DocSearcher and launching the DocSearcher Main menu.
-* Installing Java.
+* ![Installing Java].(https://bit.ly/2N5wCJe)
 * Installing Solr.
 * Installing ManifoldCF.
 * Starting Solr.
