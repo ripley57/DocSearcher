@@ -22,6 +22,6 @@
 * Installing ManifoldCF.
 * Starting Solr.
 * Creating a Solr Core.
-* Indexing the sample documents.
-* Searching the sample documents.
+* Creating a ManifoldCF Job to index the sample documents.
+* Searching the indexed sample documents.
 * Using the setenv.bat script to configure a command-line Java environment for any testing needs.
