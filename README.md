@@ -17,13 +17,13 @@
 
 # DOCSEARCHER DEMONSTRATION VIDEOS
 * Downloading DocSearcher and launching the DocSearcher Main menu.
-* ![Installing Java](https://bit.ly/2N5wCJe "Installing Java")
-* Installing Solr.
-* Installing ManifoldCF.
-* Starting Solr.
-* Creating a Solr Core.
-* Creating a ManifoldCF Job to index the sample documents in Solr.
-* Running the ManifoldCF Job.
-* Searching the indexed sample documents in Solr.
-* Using the setenv.bat script to configure a command-line Java environment for any testing needs.
-* Using Luke to examine the Lucene index.
+* [Installing Java](https://bit.ly/2N5wCJe)
+* [Installing Solr](https://bit.ly/2NGhhf6)
+* [Installing ManifoldCF](https://bit.ly/2LHSRjy)
+* [Starting Solr](https://bit.ly/2wwYR9B)
+* [Creating a Solr Core](https://bit.ly/2ww6AFr)
+* [Creating a ManifoldCF Job to index the sample documents in Solr](https://bit.ly/2PSOWnl)
+* [Running the ManifoldCF Job](https://bit.ly/2BZNpZU)
+* [Searching the indexed sample documents in Solr](https://bit.ly/2LFV6UB)
+* [Using the setenv.bat script to configure a command-line Java environment for any testing needs](https://bit.ly/2N6gWFF)
+* [Using Luke to examine the Lucene index](https://bit.ly/2ww6Jst)
