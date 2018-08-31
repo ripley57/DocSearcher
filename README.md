@@ -8,7 +8,7 @@
 
 # RUNNING DOCSEARCHER
 #### After the DocSearcher Github repository has been downloaded, simply run Menu.bat (Figure 1).  
-![DocSearcher Main menu](https://bit.ly/2KwkRu3 "Figure 1")
+![DocSearcher Main menu](https://bit.ly/2N63CB7 "Figure 1")
 #### Using this menu your first action will be to install the versions of Solr, ManifoldCF and Java that DocSearcher needs. These are all installed into sub-directories of the current directory. To keep the DocSearcher Github repository as small as possible, I didn't want to include copies of Solr and ManifoldCF, so instead I tried to make it as painless as possible to download and install them. 
 
 #### With Java and Solr installed, you can use Menu.bat to start-up Solr, create a Solr core, and inject some sample data into it. You can then perform searches of the core (Figure 2).  
