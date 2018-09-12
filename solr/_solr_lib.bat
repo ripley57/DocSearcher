@@ -75,7 +75,7 @@ REM
 	set RET=1
 	
 	REM Restart Solr.
-	cmd /C %DOCSEARCH_SOLR_BIN_DIR%\bin\solr.cmd restart -p %DOCSEARCH_SOLR_PORT_NUMBER%
+	cmd /C %DOCSEARCH_SOLR_BIN_DIR%\bin\solr.cmd restart -p %DOCSEARCH_SOLR_PORT_NUMBER% -m 1g
 	
 	REM Assume Solr restarted successfully.
 	set RET=0
@@ -108,7 +108,7 @@ REM
 	)
 	
 	REM Start Solr.
-	cmd /C %DOCSEARCH_SOLR_BIN_DIR%\bin\solr.cmd start
+	cmd /C %DOCSEARCH_SOLR_BIN_DIR%\bin\solr.cmd start -m 1g
 	
 	REM Assume Solr started successfully.
 	set RET=0
