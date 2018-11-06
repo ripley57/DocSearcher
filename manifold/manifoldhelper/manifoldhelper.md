@@ -1,9 +1,9 @@
 # Manifold Helper  
 
-## Proposal:  
+## Proposal  
 For a given file system directory to index, automate the generation of the ManifoldCF repository connector, the output connector and the job. 
 
-## Design ideas brainstorming  
+## Design ideas brainstorm  
 * Create a program input argument parser class. A separate class should make unit testing easier, and should also increase reusability 
 in future Java projects.
 * Create a language parser class and define a simple meta language to drive the application, e.g.
