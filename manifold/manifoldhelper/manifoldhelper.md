@@ -9,6 +9,6 @@ in future Java projects.
 * Create a language parser class and define a simple meta language to drive the application, e.g.
 "CREATE MANIFOLD JOB ...". This should make unit testing easier, should make the program usage clear, and we can easily add new commands 
 later, such as "DELETE MANIFOLD JOB...", etc. Investigate use of JavaCC for the parsing: https://javacc.org/.
-* The Parser class should return the parsed language as XML. 
-* Class to transform the XML returned from the parser into JSON for the various Manifold HTTP requests we require (maybe useful: https://docs.oracle.com/javase/tutorial/jaxp/xslt/transformingXML.html). 
-* How do we execute these JSON objects? Perhaps we can "post" them onto a "Blackboard", then a consumer can come along and ask for them, e.g. "give me all create repository objects". Maybe we can do more (all) things via the Blackboard, e.g. post the language statement to parse, etc. Will combining this with some sort of rules engine further increase the module de-coupling? Using a Blackboard could increase module de-coupling and enable some stages to be potentially run concurrently (e.g. parsing the language statements, and creating the JSON objects).
+* The Parser class should be able to return the parsed language as XML. 
+* Class to transform the XML returned from the parser into JSON, for the various Manifold HTTP requests we require (maybe useful: https://docs.oracle.com/javase/tutorial/jaxp/xslt/transformingXML.html). 
+* How do we execute these JSON objects? Perhaps we can "post" them onto a "Blackboard", then a consumer can come along and ask for them, e.g. "give me all create repository objects". Or maybe a standard pipeline/queue is sufficient?
