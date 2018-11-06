@@ -11,4 +11,4 @@ in future Java projects.
 later, such as "DELETE MANIFOLD JOB...", etc. Investigate use of JavaCC for the parsing: https://javacc.org/.
 * The Parser class should return the parsed language as XML. 
 * Class to transform the XML returned from the parser into JSON for the various Manifold HTTP requests we require (maybe useful: https://docs.oracle.com/javase/tutorial/jaxp/xslt/transformingXML.html). 
-* How do we execute these JSON objects? Perhaps we can "post" them onto a "Blackboard", then a consumer can come along and ask for them, e.g. "give me all create repository objects".
+* How do we execute these JSON objects? Perhaps we can "post" them onto a "Blackboard", then a consumer can come along and ask for them, e.g. "give me all create repository objects". Maybe we can do more (all) things via the Blackboard, e.g. post the language statement to parse, etc.
