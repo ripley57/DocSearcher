@@ -7,10 +7,7 @@ Given a list of one or more file system directories to index, automate the creat
 * Create a program input argument parser. A separate class should make unit testing easier, and should also increase reusability 
 in future Java projects.  
 
-* Create a language parser and define a simple metadata language to drive the application, e.g.
-"CREATE MANIFOLD JOB ...". This should make unit testing easier, should make the program usage clearer, and we can easily add new commands 
-later, such as "UPDATE MANIFOLD JOB ...", etc. Investigate the use of JavaCC for the language parsing (see https://javacc.org/).  
-What about something like this:  
+* Create a language parser (see https://javacc.org/) and define a simple meta language to drive the application. How about something like this:  
 
   CREATE CORE (  
     DIRECTORY C:\dir1,  
