@@ -11,10 +11,11 @@ in future Java projects.
 "CREATE MANIFOLD JOB ...". This should make unit testing easier, should make the program usage clearer, and we can easily add new commands 
 later, such as "UPDATE MANIFOLD JOB ...", etc. Investigate the use of JavaCC for the language parsing (see https://javacc.org/).  
 What about something like this:  
-  CREATE CORE (
-    DIRECTORY C:\dir1,
-    DIRECTORY C:\dir2,
-    DIRECTORY C:\dir3 LEVEL 1
+
+  CREATE CORE (  
+    DIRECTORY C:\dir1,  
+    DIRECTORY C:\dir2,  
+    DIRECTORY C:\dir3 LEVEL 1  
   );
 
 * The language parser should be able to return the parsed language as XML. I suggest XML because I think this would simplify how we can transform this into JSON (see the next point).
