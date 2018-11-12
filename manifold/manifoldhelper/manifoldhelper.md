@@ -12,7 +12,7 @@ in future Java projects.
   CREATE CORE (  
     DIRECTORY C:\dir1,  
     DIRECTORY C:\dir2,  
-    DIRECTORY C:\dir3 LEVEL 1  
+    DIRECTORY C:\dir3 DEPTH 1  
   );
 
 * The language parser should be able to return the parsed language as XML. I suggest XML because I think this would simplify how we can transform this into JSON (see the next point).
