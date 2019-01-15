@@ -1,0 +1,84 @@
+package docsearcher.core;
+
+/**
+ * Test the <CODE>ParseCmdLine.java</CODE> class
+ */
+ 
+import java.io.File; 
+import java.io.IOException;
+ 
+import org.junit.*;
+/*
+** Static import is a feature introduced in the Java programming language that allows 
+** members defined in a class as public static to be used in Java code without specifying 
+** the class in which the field is defined. This feature was introduced into the language 
+** in version 5.0.
+*/
+import static org.junit.Assert.*;
+
+import org.apache.commons.io.FileUtils;
+
+public class TestParseCmdLine
+{
+	private String progName = "docsearcher";
+
+	private File dir1 = new File("testing/test1/test11/test111");
+	private File dir2 = new File("testing/test2/test22/test222");
+	
+	private RunContext ctx;
+	
+	@Before
+	public void createDirs() throws IOException
+	{
+		FileUtils.forceMkdir(dir1);
+		FileUtils.forceMkdir(dir2);
+	}
+	
+	@After
+	public void deleteDirs() throws IOException
+	{
+		FileUtils.forceDelete(dir1);
+		FileUtils.forceDelete(dir2);
+	}
+	
+	@Before
+	public void instantiate() throws Exception
+	{
+		ctx = new RunContext();
+	}
+	
+	@Test
+	public void testValidRepositoryConnectorArgs() 
+	{	
+		String[] argv = new String[]{"-repository", "name=repo1|type=filesystem"};
+		boolean rtn = ParseCmdLine.parse(this.progName, argv, this.ctx);
+		assertEquals("ParseCmdLine should return true for good repository connector args.", true, rtn);
+	}
+	
+	@Test
+	public void testValidOutputConnectorArgs()
+	{
+		String[] argv = new String[]{"-output", "name=output1|type=solr|core=core1"};
+		boolean rtn = ParseCmdLine.parse(this.progName, argv, this.ctx);
+		assertEquals("ParseCmdLine should return true for good output connector args.", true, rtn);
+		
+	}
+	
+	@Test
+	public void testValidJobArgs()
+	{
+		String arg2 = String.format("name=job2|repository=repo1|output=output1|path=%s", dir2.getAbsolutePath());
+		String[] argv = new String[]{"-job", arg2};
+		boolean rtn = ParseCmdLine.parse(this.progName, argv, this.ctx);
+		assertEquals("ParseCmdLine should return true for good job args with single path.", true, rtn);
+	}
+	
+	@Test
+	public void testValidJobArgsWithMultiplePaths()
+	{
+		String arg2 = String.format("name=job1|repository=repo1|output=output1|path=%s|path=%s|depth=1", dir1.getAbsolutePath(), dir2.getAbsolutePath());
+		String[] argv = new String[]{"-job", arg2};
+		boolean rtn = ParseCmdLine.parse(this.progName, argv, this.ctx);
+		assertEquals("ParseCmdLine should return true for good job args with multiple paths.", true, rtn);
+	}
+}

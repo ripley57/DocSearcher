@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="project" default="compile">
+	
+    <description>
+    	This is the build and test Ant build.xml file for DocSearcher.jar
+    </description>
+	
+	<property name="target.jar"			location="docsearcher.jar" />
+	<property name="src.dir" 			location="src" />
+	<property name="classes.dir" 		location="classes" />
+	<property name="lib.dir" 			location="lib" />
+	<property name="resources.dir" 		location="resources" />
+	<property name="testing.dir"		location="testing" />
+	
+	<path id="docsearcher.classpath">
+	        <pathelement location="${classes.dir}" />
+			<fileset dir="${lib.dir}" includes="*.jar" />
+	</path>
+	
+	<target name="compile">
+			<mkdir dir="${classes.dir}"/>
+			<javac 
+				source="1.8"
+				target="1.8"
+				includeantruntime="false" 
+				srcdir="${src.dir}"
+				destdir="${classes.dir}" 
+				debug="true" 
+				debuglevel="lines,vars,source">
+				<classpath refid="docsearcher.classpath" />
+			</javac>
+	</target>
+	
+	<target name="package" depends="compile">
+		<copy file="${resources.dir}/log4j.properties" todir="${classes.dir}" />
+		<jar destfile="${target.jar}">
+			<fileset dir="${classes.dir}" excludes="**/Test*.class" />
+			<zipgroupfileset dir="${lib.dir}" includes="*.jar" /> 
+			<manifest>
+				<attribute name="Main-Class" value="docsearcher.core.Main" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="run-tests" depends="package">
+        <java
+            classname="org.junit.runner.JUnitCore"
+            fork="true"
+            failonerror="true">
+            <classpath refid="docsearcher.classpath" />
+			<arg value="docsearcher.core.TestParseCmdLine"/>
+        </java>
+    </target>
+	
+	<target name="run-demos" depends="package">
+		<antcall target="run-demo-help"/>
+		<antcall target="run-demo-repository"/>
+		<antcall target="run-demo-output"/>
+		<antcall target="run-demo-job-1"/>
+		<antcall target="run-demo-job-2"/>
+    </target>
+	
+	<target name="run-demo-help">
+	  	<!-- Display the -h help option. -->
+		<java jar="${target.jar}"
+			fork="true"
+			failonerror="true">
+			<arg value="-help"/>
+		</java>
+    </target>
+	
+	<target name="run-demo-repository">
+		<!-- Create a repository connector. -->
+		<java jar="${target.jar}"
+			fork="true"
+			failonerror="true">
+			<arg value="-repository"/>
+			<arg value="name=repo1|type=filesystem"/>
+		</java>
+    </target>
+	
+	<target name="run-demo-output">
+		<!-- Create a solr output connector. -->
+		<java jar="${target.jar}"
+			fork="true"
+			failonerror="true">
+			<arg value="-output"/>
+			<arg value="name=output1|type=solr|core=core1"/>
+		</java>
+    </target>
+	
+	<target name="run-demo-job-1">
+		<!-- Create a job - Demo 1 -->
+		<!-- NOTE: The "path" locations must exist, or an exception will be thrown. -->
+		<mkdir dir="${basedir}/test1/test11/test111"/>
+		<mkdir dir="${basedir}/test2/test22/test222"/>
+		<java jar="${target.jar}"
+			fork="true"
+			failonerror="true">
+			<arg value="-job"/>
+			<arg value="name=job1|repository=repo1|output=output1|path=${basedir}/test1|path=${basedir}/test2|depth=1"/>
+		</java>
+		<delete dir="${basedir}/test1"/>
+		<delete dir="${basedir}/test2"/>
+    </target>
+	
+	<target name="run-demo-job-2">
+		<!-- Create a job - Demo 2 (defaults to filesystem folder depth of 0) -->
+		<!-- NOTE: The "path" locations must exist, or an exception will be thrown. -->
+		<mkdir dir="${basedir}/test2/test22/test222"/>
+		<java jar="${target.jar}"
+			fork="true"
+			failonerror="true">
+			<arg value="-job"/>
+			<arg value="name=job2|repository=repo1|output=output1|path=${basedir}/test2"/>
+		</java>
+		<delete dir="${basedir}/test2"/>
+    </target>
+	
+	<target name="clean">
+        <delete dir="${classes.dir}" failonerror="false"/>
+		<delete file="${target.jar}" failonerror="false"/>
+    </target>
+	
+</project>
