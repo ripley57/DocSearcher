@@ -53,6 +53,28 @@ function solr_install()
 }
 
 
+function solr_apply_configset_fixes()
+{
+    # My configset "my-configset-solr-731" included an edit
+    # to the Velocity file "richtext_doc.vm" to replace "file:///"
+    # with "appurl:///" (see line 82). This was so that we could
+    # launch the native application of the file when the user 
+    # clicked on the link. This only works on Windows, because we
+    # there we can edit the Registry, to workaround the known web 
+    # browser security feature that prevents a web page loaded from
+    # a web server from opening local files, i.e. "file:///...".
+    # The change below prevents "file:///" from being replaced
+    # with "appurl:///" on our Linux install here.
+    sed -i '82,82s/file:/xxxfile:/' "$DOCSEARCH_SOLR_CONFIGSET_DIR/my-configset-solr-731/conf/velocity/richtext_doc.vm"
+    # Note: I have not yet found a working Linux equivalent to the
+    # use of "appurl:///" on Windows. There exists a Firefox addon
+    # named "Local Filesystem Links", but I cannot get this to work
+    # (as of 12-02-2019). I tried with both Lubuntu (LXDE ui) and 
+    # Ubuntu (Gnome), but it fails with an "ERROR undefined" pop-up
+    # when I click on a link. For more details on the addon:
+    # https://addons.mozilla.org/en-GB/firefox/addon/local-filesystem-links/
+}
+
 function solr_install_overlay()
 {
     if [ $(solr_state) == NOT-INSTALLED ]; then
@@ -101,6 +123,8 @@ function solr_install_myconfigsets()
         local _extracted_dir="${_z%%.*}"
         utils_install_zip "$DOCSEARCH_SOLR_MY_CONFIGSET_DIR/$_z" "$DOCSEARCH_SOLR_CONFIGSET_DIR" "$DOCSEARCH_SOLR_CONFIGSET_DIR/$_extracted_dir"
     done
+
+    solr_apply_configset_fixes
 }
 
 
