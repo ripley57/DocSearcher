@@ -7,6 +7,7 @@ function solr_init()
     DOCSEARCH_SOLR_DIR="${_pwd}"
     DOCSEARCH_SOLR_BIN_DIR="${_pwd}/solr-7.3.1/bin"
     DOCSEARCH_SOLR_SERVER_DIR="${_pwd}/solr-7.3.1/server"
+    DOCSEARCH_SOLR_DIST_DIR="${_pwd}/solr-7.3.1/dist"
     DOCSEARCH_SOLR_LOGS_DIR="${_pwd}/solr-7.3.1/server/logs"
     DOCSEARCH_SOLR_CONFIGSET_DIR="${_pwd}/solr-7.3.1/server/solr/configsets"
     DOCSEARCH_SOLR_MY_CONFIGSET_DIR="${_pwd}/myconfigsets"
@@ -18,6 +19,8 @@ function solr_init()
     DOCSEARCH_SOLR_DOWNLOAD_EXTRACT_TO_DIR=$DOCSEARCH_SOLR_DIR
     # The directory we expect to see after extraction.
     DOCSEARCH_SOLR_DOWNLOAD_EXTRACTED_DIR=$DOCSEARCH_SOLR_DOWNLOAD_EXTRACT_TO_DIR/solr-7.3.1
+    # Solr log files.
+    DOCSEARCH_SOLR_LOGS=( $DOCSEARCH_SOLR_SERVER_DIR/logs/solr.log )
 }
 solr_init
 
@@ -44,14 +47,37 @@ function solr_install()
     "$DOCSEARCH_SOLR_DOWNLOAD_ZIP_FILENAME" \
     "$DOCSEARCH_SOLR_DOWNLOAD_EXTRACT_TO_DIR" \
     "$DOCSEARCH_SOLR_DOWNLOAD_EXTRACTED_DIR"
-    solr_install_myconfigsets
+    solr_install_overlay
     solr_apply_fixes
+    solr_install_myconfigsets
+}
+
+
+function solr_install_overlay()
+{
+    if [ $(solr_state) == NOT-INSTALLED ]; then
+        echo "Solr not installed!"
+	return
+    fi
+
+    echo "Installing our Solr overlay ..."
+
+    # Install our rebuilt solr-velocity jar with LinkTool support.
+    # (https://www.cyberciti.biz/faq/explain-brace-expansion-in-cp-mv-bash-shell-commands/)
+    mv "$DOCSEARCH_SOLR_DIST_DIR/solr-velocity-7.3.1.jar"{,.before_overlay}
+    cp "$DOCSEARCH_SOLR_DIR/overlays/solr-731/solr-velocity-7.3.1.jar" "$DOCSEARCH_SOLR_DIST_DIR/"
+
+    # Add missing document type icons which are based on file extension.
+    # Note: Copy doc.png to docx.png in the same directory.
+    cp "$DOCSEARCH_SOLR_SERVER_DIR/solr-webapp/webapp/img/filetypes/doc.png" "$DOCSEARCH_SOLR_SERVER_DIR/solr-webapp/webapp/img/filetypes/docx.png"
+    cp "$DOCSEARCH_SOLR_SERVER_DIR/solr-webapp/webapp/img/ico/mail.png" "$DOCSEARCH_SOLR_SERVER_DIR/solr-webapp/webapp/img/filetypes/msg.png"
 }
 
 
 function solr_apply_fixes()
 {
-    echo "Applying Solr fixes ..."
+    echo "Applying our Solr fixes ..."
+
     sed -i '711,711s/< <(/ <\$(/' "$DOCSEARCH_SOLR_BIN_DIR/solr"
 }
 
@@ -66,7 +92,7 @@ function solr_install_myconfigsets()
     IFS=$'\n' _configset_zips=( $(find "$DOCSEARCH_SOLR_MY_CONFIGSET_DIR" -maxdepth 1 -type f -iname "*.zip" -exec sh -c 'echo ${1##*/}' _ {} \; ) )
 
     if [ ${#_configset_zips[*]} -gt 0 ]; then
-        echo "Installing custom configsets ..."
+        echo "Installing our configsets ..."
     fi
 
     local _z
@@ -87,9 +113,10 @@ function solr_uninstall()
 
     echo  "Uninstalling Solr ..."
     local _datestamp=$(utils_get_datestamp)
-    # Rename the Solr directory (rather than deleting it).
     if [ -d "$DOCSEARCH_SOLR_DOWNLOAD_EXTRACTED_DIR" ]; then
          mv "$DOCSEARCH_SOLR_DOWNLOAD_EXTRACTED_DIR" "${DOCSEARCH_SOLR_DOWNLOAD_EXTRACTED_DIR}_${_datestamp}"
+	 # Disk space can be a problem, so lets really delete it.
+	 rm -fr "${DOCSEARCH_SOLR_DOWNLOAD_EXTRACTED_DIR}_${datestamp}"
     fi
 }
 
@@ -115,13 +142,14 @@ function solr_start()
     fi
 
     if [ $(solr_state) == RUNNING ]; then
-        echo "solr_start: Already running!"
+        echo "Solr is already running!"
 	return
     fi
 
     echo "Starting Solr..."
     utils_assert_var "DOCSEARCH_SOLR_BIN_DIR" "solr_start"
-    (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr start -m 1g 2>&1 >/dev/null) 2>&1 >/dev/null
+    (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr start -m 1g 2>&1 >/dev/null) 2>&1 >/dev/null &
+    sleep 60
 
     if [ $(solr_state) == RUNNING ]; then
         echo "Solr successfully started."
@@ -262,7 +290,7 @@ function solr_delete_index()
     fi
 
     # Delete the core index directory.
-    rm -fr "$_core_dir/data"
+    rm -fr "$_core_dir/data" && echo "Successfully deleted index for core \"$_core\""
     # Recreate an empty "data" directory.
     mkdir "$_core_dir/data" 
 }
@@ -319,4 +347,28 @@ function solr_import_sample_docs()
     local _core=$1
     utils_assert_arg "core" "$_core" "solr_import_sample_docs"
     java -Durl="http://localhost:8983/solr/$_core/update" -jar "$DOCSEARCH_SOLR_DIR/demo/post.jar" "$DOCSEARCH_SOLR_DIR/demo/add.xml"
+}
+
+
+function solr_logs()
+{
+    local _f
+    for _f in "${DOCSEARCH_SOLR_LOGS[@]}"
+    do
+        echo $_f
+    done
+}
+
+
+function solr_kill()
+{
+    fuser -k $DOCSEARCH_SOLR_PORT/tcp
+}
+
+
+function solr_info_page()
+{
+    echo "Launching Solr info page ..."
+
+    utils_open_url file://$DOCSEARCH_SOLR_DIR/index.html
 }

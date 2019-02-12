@@ -3,6 +3,7 @@ function manifold_init()
     local _pwd="$(utils_script_dir "$BASH_SOURCE")"
     #echo "manifold_init: _pwd=$_pwd"
     DOCSEARCH_MANIFOLD_VERSION=1.9
+    DOCSEARCH_MANIFOLD_PORT=8345
     DOCSEARCH_MANIFOLD_DIR="${_pwd}"
     DOCSEARCH_MANIFOLD_BIN_DIR="${_pwd}/apache-manifoldcf-1.9/example"
     DOCSEARCH_MANIFOLD_DOWNLOAD_ZIP_URL=http://archive.apache.org/dist/manifoldcf/apache-manifoldcf-1.9/apache-manifoldcf-1.9-bin.zip
@@ -13,6 +14,8 @@ function manifold_init()
     DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACT_TO_DIR=$DOCSEARCH_MANIFOLD_DIR
     # The directory we expect to see after extraction.
     DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACTED_DIR=$DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACT_TO_DIR/apache-manifoldcf-1.9
+    # Manifold logs.
+    DOCSEARCH_MANIFOLD_LOGS=( $DOCSEARCH_MANIFOLD_BIN_DIR/derby.log $DOCSEARCH_MANIFOLD_BIN_DIR/logs/manifoldcf.log )
 }
 manifold_init
 
@@ -51,9 +54,10 @@ function manifold_uninstall()
 
     echo  "Uninstalling Manifold ..."
     local _datestamp=$(utils_get_datestamp)
-    # Rename the Manifold directory (rather than deleting it).
     if [ -d "$DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACTED_DIR" ]; then
          mv "$DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACTED_DIR" "${DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACTED_DIR}_${_datestamp}"
+	 # Disk space can be a problem, so lets really delete it.
+	 rm -fr "${DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACTED_DIR}_${datestamp}"
     fi
 }
 
@@ -83,7 +87,7 @@ function manifold_start()
 
     echo "Starting Manifold..."
     utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
-    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./start.sh 2>&1 >/dev/null &) 2>&1 >/dev/null
+    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./start.sh 2>&1 >/dev/null &) 2>&1 >/dev/null &
     sleep 60
 
     if [ $(manifold_state) == RUNNING ]; then
@@ -145,4 +149,28 @@ function manifold_installed_state()
 function manifold_funcs()
 {
     set | grep '^manifold_'
+}
+
+
+function manifold_logs()
+{
+    local _f
+    for _f in "${DOCSEARCH_MANIFOLD_LOGS[@]}"
+    do
+        echo $_f
+    done
+}
+
+
+function manifold_kill()
+{
+    fuser -k $DOCSEARCH_MANIFOLD_PORT/tcp
+}
+
+
+function manifold_info_page()
+{
+   echo "Launching Manifold info page ..."
+
+   utils_open_url file://$DOCSEARCH_MANIFOLD_DIR/index.html
 }

@@ -72,7 +72,7 @@ function utils_init()
 
 function utils_open_url()
 {
-     /usr/bin/firefox -new-tab "$1" &
+     /usr/bin/firefox -new-tab "$1" 2>/dev/null &
 }
 
 
