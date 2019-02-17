@@ -190,3 +190,37 @@ function utils_are_you_sure()
     read _tmp
     [[ "$_tmp" =~ [yY] ]]
 }
+
+
+function utils_get_persisted_value()
+{
+    local _values_file=$1
+    local _name=$2
+
+    utils_assert_var "_values_file" "$_values_file" "utils_get_persisted_value"
+    utils_assert_var "_name" "$_name" "utils_get_persisted_value"
+
+    local _value=undefined
+    if grep -q "^$_name=" "$_values_file" 2>/dev/null; then
+        _value=$(sed -n "s/^$_name=\(.*\)/\1/p" "$_values_file")
+    fi
+    echo "$_value"
+}
+
+
+function utils_set_persisted_value()
+{
+    local _values_file=$1
+    local _name=$2
+    local _value=$3
+
+    utils_assert_var "_values_file" "$_values_file" "utils_set_persisted_value"
+    utils_assert_var "_name" "$_name" "utils_set_persisted_value"
+    utils_assert_var "_value" "$_value" "utils_set_persisted_value"
+
+    if grep -q "^$_name=" "$_values_file" 2>/dev/null; then
+        sed -i "s/$_name=.*/$_name=$_value/" "$_values_file"
+    else
+        echo "$_name=$_value" >> "$_values_file"
+    fi
+}

@@ -18,6 +18,7 @@ function show_manifold_menu()
 	echo "4) Launch info page"
 	echo "5) Manifold logs"
 	echo "6) Kill Manifold process"
+        echo "7) Change server hostname"
 	echo "x) Exit menu"
 	echo
 	echo -n "Select option: "
@@ -30,6 +31,7 @@ function show_manifold_menu()
 	4) manifold_info_page;	utils_press_any_key;;
 	5) manifold_menu_logs; 	utils_press_any_key;;
 	6) manifold_kill;	utils_press_any_key;;
+        7) manifold_menu_hostname;;
 	x) return;;
 	esac
     done
@@ -52,4 +54,17 @@ function manifold_menu_ui()
 	return
     fi
     manifold_ui
+}
+
+
+function manifold_menu_hostname()
+{
+    local _new_hostname=
+    local _current_hostname="$(manifold_gethostname)"
+    echo "Current hostname: $_current_hostname"
+    echo -n "Enter new hostname, or x: "
+    read _new_hostname
+    if [ ! -z "$_new_hostname" ] && [ "$_new_hostname" != "x" ]; then
+        manifold_sethostname "$_new_hostname"
+    fi
 }

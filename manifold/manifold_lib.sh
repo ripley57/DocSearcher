@@ -16,6 +16,8 @@ function manifold_init()
     DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACTED_DIR=$DOCSEARCH_MANIFOLD_DOWNLOAD_EXTRACT_TO_DIR/apache-manifoldcf-1.9
     # Manifold logs.
     DOCSEARCH_MANIFOLD_LOGS=( $DOCSEARCH_MANIFOLD_BIN_DIR/derby.log $DOCSEARCH_MANIFOLD_BIN_DIR/logs/manifoldcf.log )
+    # Stores persisted values.
+    DOCSEARCH_MANIFOLD_PERSISTED_VALUES="$DOCSEARCH_MANIFOLD_DIR/.persisted_values"
 }
 manifold_init
 
@@ -62,6 +64,26 @@ function manifold_uninstall()
 }
 
 
+function manifold_gethostname()
+{
+    local _hostname=
+    _hostname="$(utils_get_persisted_value "$DOCSEARCH_MANIFOLD_PERSISTED_VALUES" "hostname")"
+    if [ -z "$_hostname" ] || [ "$_hostname" = "undefined" ]; then
+        echo "localhost"
+    else
+        echo "$_hostname"
+    fi
+}
+
+
+function manifold_sethostname()
+{
+    local _hostname=$1
+    utils_assert_var "_hostname" "$_hostname" "manifold_sethostname"
+    utils_set_persisted_value "$DOCSEARCH_MANIFOLD_PERSISTED_VALUES" "hostname" "$_hostname"
+}
+
+
 function manifold_ui()
 {
     if [ $(manifold_state) == NOT-INSTALLED ]; then
@@ -69,7 +91,7 @@ function manifold_ui()
 	return
     fi
     echo "Launching Manifold UI ..."
-    utils_open_url 'http://localhost:8345/mcf-crawler-ui/'
+    utils_open_url "http://$(manifold_gethostname):8345/mcf-crawler-ui/"
 }
 
 
@@ -81,19 +103,19 @@ function manifold_start()
     fi
 
     if [ $(manifold_state) == RUNNING ]; then
-        echo "manifold_start: Already running!"
+        echo "Manifold already running!"
 	return
     fi
 
     echo "Starting Manifold..."
-    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
-    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./start.sh 2>&1 >/dev/null &) 2>&1 >/dev/null &
+    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "$DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
+    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./start.sh 2>&1 &)
     sleep 60
 
     if [ $(manifold_state) == RUNNING ]; then
         echo "Manifold successfully started."
     else
-        echo "manifold_start: Failed to start Manifold!"
+        echo "Failed to start Manifold!"
 	return
     fi
 }
@@ -107,19 +129,19 @@ function manifold_stop()
     fi
 
     if [ $(manifold_state) == STOPPED ]; then
-        echo "manifold_start: Already stopped!"
+        echo "Manifold already stopped!"
 	return
     fi
 
     echo "Stopping Manifold..."
-    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
-    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./stop.sh  2>&1 >/dev/null &) 2>&1 >/dev/null
+    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "$DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
+    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./stop.sh 2>&1 &) 2>&1
     sleep 30
 
     if [ $(manifold_state) == STOPPED ]; then
         echo "Manifold successfully stopped."
     else
-        echo "manifold_start: Failed to stop Manifold!"
+        echo "Failed to stop Manifold!"
 	return
     fi
 }
@@ -140,7 +162,7 @@ function manifold_state()
 function manifold_installed_state()
 {
     local _ret=NOT-INSTALLED
-    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
+    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "$DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
     [ -e "$DOCSEARCH_MANIFOLD_BIN_DIR" ] && _ret=INSTALLED
     echo $_ret
 }
@@ -171,6 +193,5 @@ function manifold_kill()
 function manifold_info_page()
 {
    echo "Launching Manifold info page ..."
-
    utils_open_url file://$DOCSEARCH_MANIFOLD_DIR/index.html
 }
