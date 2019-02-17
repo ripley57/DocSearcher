@@ -9,13 +9,13 @@ function show_docsearcher_menu()
         clear
 	echo "DOCUMENT SEARCHER"
 	echo "================="
-	printf "%-8s : %s\n" "Solr" "$(solr_state)"
-	printf "%-8s : %s\n" "Manifold" "$(manifold_state)"
+	printf "%-8s : %s\n" "Solr" "$(menu_solr_state)"
+	printf "%-8s : %s\n" "Manifold" "$(menu_manifold_state)"
         echo
 	echo "1) Perform a Search"
         echo "2) Manage Solr"
 	echo "3) Manage Manifold"
-	echo "4) Installation"
+	echo "4) Local Installation"
 	echo "x) Exit"
 	echo
 	echo -n "Select option: "
@@ -32,14 +32,36 @@ function show_docsearcher_menu()
 }
 
 
+function menu_solr_state()
+{
+    if solr_isRemote; then
+        local _hostname="$(solr_gethostname)"
+        echo "Remote [$_hostname]"
+    else
+        $(solr_state)
+    fi
+}
+
+
+function menu_manifold_state()
+{
+    if manifold_isRemote; then
+        local _hostname="$(manifold_gethostname)"
+        echo "Remote [$_hostname]"
+    else
+        $(manifold_state)
+    fi
+}
+
+
 function show_installation_menu()
 {
     local _choice
     while [ "$_choice" != "x" ]
     do
         clear
-	echo "INSTALLATION"
-	echo "============"
+	echo "LOCAL INSTALLATION"
+	echo "=================="
         printf "%-8s : %-13s  %s\n" "Java"     "$(java_installed_state)" "$(java_version)"
 	printf "%-8s : %-13s  %s\n" "Solr"     "$(solr_state)"           "$(solr_version)"
 	printf "%-8s : %-13s  %s\n" "Manifold" "$(manifold_state)"       "$(manifold_version)"

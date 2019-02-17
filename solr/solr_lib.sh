@@ -21,6 +21,8 @@ function solr_init()
     DOCSEARCH_SOLR_DOWNLOAD_EXTRACTED_DIR=$DOCSEARCH_SOLR_DOWNLOAD_EXTRACT_TO_DIR/solr-7.3.1
     # Solr log files.
     DOCSEARCH_SOLR_LOGS=( $DOCSEARCH_SOLR_SERVER_DIR/logs/solr.log )
+    # Stores persisted values.
+    DOCSEARCH_SOLR_PERSISTED_VALUES="$DOCSEARCH_SOLR_DIR/.persisted_values"
 }
 solr_init
 
@@ -31,8 +33,43 @@ function solr_version()
 }
 
 
+function solr_gethostname()
+{
+    local _hostname=
+    _hostname="$(utils_get_persisted_value "$DOCSEARCH_SOLR_PERSISTED_VALUES" "hostname")"
+    if [ -z "$_hostname" ] || [ "$_hostname" = "undefined" ]; then
+        echo "localhost"
+    else
+        echo "$_hostname"
+    fi
+}
+
+
+function solr_sethostname()
+{
+    local _hostname=$1
+    utils_assert_var "_hostname" "$_hostname" "solr_sethostname"
+    utils_set_persisted_value "$DOCSEARCH_SOLR_PERSISTED_VALUES" "hostname" "$_hostname"
+}
+
+
+function solr_isRemote()
+{
+    [ "$(solr_gethostname)" != "localhost" ]
+}
+
+
 function solr_install()
 {
+    if solr_isRemote; then
+        echo 
+        echo "Sorry, Solr is running remotely [$(solr_gethostname)]."
+        echo "Reset the Solr hostname to locahost if you want"
+        echo "to install Solr locally!"
+        echo
+        return
+    fi
+
     if [ "$1" == "reinstall" ]; then
         if ! utils_are_you_sure "Re-install Solr? (y/n): "; then
             return
@@ -147,19 +184,21 @@ function solr_uninstall()
 
 function solr_search_core()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
-        echo "Solr not installed!"
-	return
-    fi
     local _core=$1
     utils_assert_arg "core" "$_core" "solr_search_core"
-    echo "Launching browser to search core \"$_core\" ..."
-    utils_open_url "http://localhost:8983/solr/$_core/browse"
+    echo "Launching browser to search core ..."
+    echo "http://$(solr_gethostname):8983/solr/$_core/browse"
+    utils_open_url "http://$(solr_gethostname):8983/solr/$_core/browse"
 }
 
 
 function solr_start()
 {
+    if solr_isRemote ; then
+        echo "Cannot start Solr! It is running remotely [$(solr_gethostname)]"
+        return
+    fi
+
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
 	return
@@ -186,6 +225,11 @@ function solr_start()
 
 function solr_stop()
 {
+    if solr_isRemote ; then
+        echo "Cannot start Solr! It is running remotely [$(solr_gethostname)]"
+        return
+    fi
+
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
 	return
@@ -211,6 +255,11 @@ function solr_stop()
 
 function solr_restart()
 {
+    if solr_isRemote ; then
+        echo "Cannot re-start Solr! It is running remotely [$(solr_gethostname)]"
+        return
+    fi
+
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
 	return
@@ -370,7 +419,7 @@ function solr_import_sample_docs()
 
     local _core=$1
     utils_assert_arg "core" "$_core" "solr_import_sample_docs"
-    java -Durl="http://localhost:8983/solr/$_core/update" -jar "$DOCSEARCH_SOLR_DIR/demo/post.jar" "$DOCSEARCH_SOLR_DIR/demo/add.xml"
+    java -Durl="http://$(solr_gethostname):8983/solr/$_core/update" -jar "$DOCSEARCH_SOLR_DIR/demo/post.jar" "$DOCSEARCH_SOLR_DIR/demo/add.xml"
 }
 
 

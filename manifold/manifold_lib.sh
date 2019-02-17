@@ -30,6 +30,15 @@ function manifold_version()
 
 function manifold_install()
 {
+    if manifold_isRemote; then
+        echo
+        echo "Sorry, Manifold is running remotely [$(manifold_gethostname)]."
+        echo "Reset the Manifold hostname to locahost if you want"
+        echo "to install Manifold locally!"
+        echo
+        return
+    fi
+
     if [ "$1" == "reinstall" ]; then
         if ! utils_are_you_sure "Re-install Manifold? (y/n): "; then
             return
@@ -81,6 +90,12 @@ function manifold_sethostname()
     local _hostname=$1
     utils_assert_var "_hostname" "$_hostname" "manifold_sethostname"
     utils_set_persisted_value "$DOCSEARCH_MANIFOLD_PERSISTED_VALUES" "hostname" "$_hostname"
+}
+
+
+function manifold_isRemote()
+{
+    [ "$(manifold_gethostname)" != "localhost" ]
 }
 
 

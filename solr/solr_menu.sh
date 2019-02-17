@@ -24,6 +24,7 @@ function show_solr_menu()
 	echo "10) Solr logs"
 	echo "11) Kill Solr process"
 	echo "12) Launch info page"
+        echo "13) Change Solr host"
 	echo "x)  Exit menu"
 	echo
 	echo -n "Select option: "
@@ -31,28 +32,106 @@ function show_solr_menu()
 
 	case $_choice in
         1)  solr_menu_search_core;;
-	2)  solr_start;			utils_press_any_key;;
-	3)  solr_stop; 			utils_press_any_key;;
-	4)  solr_restart; 		utils_press_any_key;;
+	2)  solr_menu_start;		utils_press_any_key;;
+	3)  solr_menu_stop;		utils_press_any_key;;
+	4)  solr_menu_restart;		utils_press_any_key;;
         5)  solr_menu_list_cores;;
         6)  solr_menu_create_core;;
         7)  solr_menu_delete_core;;
 	8)  solr_menu_delete_index;;
 	9)  solr_menu_import_sample_docs;;
 	10) solr_menu_logs; 		utils_press_any_key;;
-	11) solr_kill;			utils_press_any_key;;
+	11) solr_menu_kill;		utils_press_any_key;;
 	12) solr_info_page;		utils_press_any_key;;
+        13) solr_menu_hostname;;
 	x) return;;
 	esac
     done
 }
 
 
+function solr_menu_kill()
+{
+    if solr_isRemote ; then
+        echo
+        echo "Sorry, can't kill Solr!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        return
+    fi
+
+    solr_kill
+}
+
+
+function solr_menu_start()
+{
+    if solr_isRemote ; then
+        echo
+        echo "Sorry, can't start Solr!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        return
+    fi
+
+    solr_start
+}
+
+
+function solr_menu_stop()
+{
+    if solr_isRemote ; then
+        echo
+        echo "Sorry, can't stop Solr!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        return
+    fi
+
+    solr_stop
+}
+
+
+function solr_menu_restart()
+{
+    if solr_isRemote ; then
+        echo
+        echo "Sorry, can't restart Solr!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        return
+    fi
+
+    solr_restart
+}
+
+
 function solr_menu_logs()
 {
+    if solr_isRemote ; then
+        echo
+        echo "Sorry, can't list logs!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        return
+    fi
+
     echo
     solr_logs
     echo
+}
+
+
+function solr_menu_hostname()
+{
+    local _new_hostname=
+    local _current_hostname="$(solr_gethostname)"
+    echo "Current Solr host: $_current_hostname"
+    echo -n "Enter new Solr host, or x: "
+    read _new_hostname
+    if [ ! -z "$_new_hostname" ] && [ "$_new_hostname" != "x" ]; then
+        solr_sethostname "$_new_hostname"
+    fi
 }
 
 
@@ -71,7 +150,6 @@ function solr_select_core()
 
     # Return selected core using passed variable name.
     eval $__returnvar=""
-
     eval $(solr_cores)
 
     while [ "$_choice" != "x" ]
@@ -115,6 +193,15 @@ function solr_select_core()
 
 function solr_menu_import_sample_docs()
 {
+    if solr_isRemote ; then
+        echo
+        echo "Sorry, can't import sample docs!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        utils_press_any_key
+        return
+    fi
+
     if [ "$(solr_state)" != "RUNNING" ]; then
         echo "Solr must be running!"
 	utils_press_any_key
@@ -135,6 +222,21 @@ function solr_menu_import_sample_docs()
 
 function solr_menu_search_core()
 {
+    # Searching a remote instance of Solr?
+    local _core_to_search=
+    if solr_isRemote; then
+        echo
+        echo "NOTE: You are using a remote Solr instance [$(solr_gethostname)]."
+        echo 
+        echo -n "Please enter name of the core to search, or x: "
+        read _core_to_search
+        if [ ! -z "$_core_to_search" ] && [ "$_core_to_search" != "x" ]; then
+            solr_search_core "$_core_to_search"
+            utils_press_any_key
+        fi
+        return
+    fi
+
     if [ $(solr_state) != "RUNNING" ]; then
         echo "Solr must be running!"
 	utils_press_any_key
@@ -153,6 +255,15 @@ function solr_menu_search_core()
 
 function solr_menu_list_cores()
 {
+    if solr_isRemote; then
+        echo
+        echo "Sorry, cannot list cores!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        utils_press_any_key
+        return
+    fi
+
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
 	utils_press_any_key
@@ -195,6 +306,15 @@ function solr_menu_list_cores()
 
 function solr_menu_delete_core()
 {
+    if solr_isRemote; then
+        echo
+        echo "Sorry, cannot delete a core!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        utils_press_any_key
+        return
+    fi
+
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
 	utils_press_any_key
@@ -212,6 +332,15 @@ function solr_menu_delete_core()
 
 function solr_menu_create_core()
 {
+    if solr_isRemote; then
+        echo
+        echo "Sorry, cannot create a core!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        utils_press_any_key
+        return
+    fi
+
     if [ $(solr_state) != "RUNNING" ]; then
         echo "Solr must be running!"
 	utils_press_any_key
@@ -267,6 +396,15 @@ function solr_menu_create_core()
 
 function solr_menu_delete_index()
 {
+    if solr_isRemote; then
+        echo
+        echo "Sorry, cannot delete a core index!"
+        echo "Solr is running remotely [$(solr_gethostname)]"
+        echo
+        utils_press_any_key
+        return
+    fi
+
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
 	utils_press_any_key
