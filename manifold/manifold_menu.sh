@@ -42,9 +42,9 @@ function manifold_menu_state()
 {
     if manifold_isRemote; then
         local _hostname="$(solr_gethostname)"
-        echo "Unknown (Remote $_hostname)"
+        echo "$(manifold_state) (Remote $_hostname)"
     else
-        $(manifold_state)
+        manifold_state
     fi
 }
 

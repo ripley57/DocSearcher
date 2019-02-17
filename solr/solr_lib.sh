@@ -33,6 +33,12 @@ function solr_version()
 }
 
 
+function solr_getport()
+{
+    echo "$DOCSEARCH_SOLR_PORT"
+}
+
+
 function solr_gethostname()
 {
     local _hostname=
@@ -287,13 +293,13 @@ function solr_restart()
 
 function solr_state()
 {
-    if [ -z "$DOCSEARCH_SOLR_BIN_DIR" ] || [ ! -e "$DOCSEARCH_SOLR_BIN_DIR" ]; then
-        echo "NOT-INSTALLED"
-	return
+    if ! solr_isRemote ; then
+        if [ -z "$DOCSEARCH_SOLR_BIN_DIR" ] || [ ! -e "$DOCSEARCH_SOLR_BIN_DIR" ]; then
+            echo "NOT-INSTALLED"
+	    return
+        fi
     fi
-    local _ret=STOPPED
-    netstat -an | grep -i "listen" | grep :8983 >/dev/null && _ret=RUNNING
-    echo $_ret
+    utils_service_state "$(solr_gethostname)" "$(solr_getport)"
 }
 
 

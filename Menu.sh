@@ -36,9 +36,9 @@ function menu_solr_state()
 {
     if solr_isRemote; then
         local _hostname="$(solr_gethostname)"
-        echo "Unknown (Remote $_hostname)"
+        echo "$(solr_state) (Remote $_hostname:$(solr_getport))"
     else
-        solr_state
+        echo "$(solr_state):$(solr_getport)"
     fi
 }
 
@@ -47,9 +47,9 @@ function menu_manifold_state()
 {
     if manifold_isRemote; then
         local _hostname="$(manifold_gethostname)"
-        echo "Unknown (Remote $_hostname)"
+        echo "$(manifold_state) (Remote $_hostname:$(manifold_getport))"
     else
-        $(manifold_state)
+        echo "$(manifold_state):$(manifold_getport)"
     fi
 }
 

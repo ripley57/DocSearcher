@@ -54,7 +54,7 @@ function solr_menu_state()
 {
     if solr_isRemote; then
         local _hostname="$(solr_gethostname)"
-        echo "Unknown (Remote $_hostname)"
+        echo "$(solr_state) (Remote $_hostname)"
     else
         solr_state
     fi

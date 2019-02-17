@@ -73,6 +73,12 @@ function manifold_uninstall()
 }
 
 
+function manifold_getport()
+{
+    echo "$DOCSEARCH_MANIFOLD_PORT"
+}
+
+
 function manifold_gethostname()
 {
     local _hostname=
@@ -164,13 +170,13 @@ function manifold_stop()
 
 function manifold_state()
 {  
-    if [ -z "$DOCSEARCH_MANIFOLD_BIN_DIR" ] || [ ! -e "$DOCSEARCH_MANIFOLD_BIN_DIR" ]; then
-        echo "NOT-INSTALLED"
-	return
+    if ! manifold_isRemote ; then
+        if [ -z "$DOCSEARCH_MANIFOLD_BIN_DIR" ] || [ ! -e "$DOCSEARCH_MANIFOLD_BIN_DIR" ]; then
+            echo "NOT-INSTALLED"
+	    return
+        fi
     fi
-    local _ret=STOPPED
-    netstat -an | grep -i "listen"| grep :8345 >/dev/null && _ret=RUNNING
-    echo $_ret
+    utils_service_state "$(manifold_gethostname)" "$(manifold_getport)"
 }
 
 

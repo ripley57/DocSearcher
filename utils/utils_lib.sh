@@ -224,3 +224,24 @@ function utils_set_persisted_value()
         echo "$_name=$_value" >> "$_values_file"
     fi
 }
+
+
+function utils_service_state()
+{
+    local _host=$1
+    local _port=$2
+
+    utils_assert_var "_host" "$_host" "utils_service_state"
+    utils_assert_var "_port" "$_port" "utils_service_state"
+
+    local _ret=STOPPED
+    if [ "$_host" = "localhost" ]; then
+        # Use netstat to check a local service.
+        netstat -an | grep -i "listen" | grep :$_port >/dev/null && _ret=RUNNING
+    else
+        # Use nc to check a remote service.
+        nc -w 10 -v "$_host" "$_port" </dev/null 2>/dev/null && _ret=RUNNING
+    fi
+    echo $_ret
+}
+
