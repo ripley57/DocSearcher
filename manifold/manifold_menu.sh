@@ -10,7 +10,7 @@ function show_manifold_menu()
         clear
 	echo "MANAGE MANIFOLD"
 	echo "==============="
-	printf "%-12s : %s\n" "Manifold status" "$(manifold_state)"
+	printf "%s : %s\n" "Manifold state" "$(manifold_menu_state)"
         echo
 	echo "1) Start Manifold"
         echo "2) Stop Manifold"
@@ -35,6 +35,17 @@ function show_manifold_menu()
 	x) return;;
 	esac
     done
+}
+
+
+function manifold_menu_state()
+{
+    if manifold_isRemote; then
+        local _hostname="$(solr_gethostname)"
+        echo "Unknown (Remote $_hostname)"
+    else
+        $(manifold_state)
+    fi
 }
 
 

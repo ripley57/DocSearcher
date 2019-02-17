@@ -10,7 +10,7 @@ function show_solr_menu()
         clear
 	echo "MANAGE SOLR"
 	echo "==========="
-	printf "%-8s : %s\n" "Solr status" "$(solr_state)"
+	printf "%s : %s\n" "Solr state" "$(solr_menu_state)"
         echo
 	echo "1)  Search a core"
         echo "2)  Start Solr"
@@ -47,6 +47,17 @@ function show_solr_menu()
 	x) return;;
 	esac
     done
+}
+
+
+function solr_menu_state()
+{
+    if solr_isRemote; then
+        local _hostname="$(solr_gethostname)"
+        echo "Unknown (Remote $_hostname)"
+    else
+        solr_state
+    fi
 }
 
 

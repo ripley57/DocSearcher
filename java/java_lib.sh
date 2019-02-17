@@ -36,7 +36,7 @@ java_init
 function java_version()
 {
     if [ "$(java_installed_state)" == INSTALLED ]; then
-        java -version 2>&1 | head -1 | grep -i java
+        java -version 2>&1 | head -1 | grep -i version
     else
         echo NOT-INSTALLED
     fi
