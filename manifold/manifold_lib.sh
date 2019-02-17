@@ -44,7 +44,7 @@ function manifold_install()
 
 function manifold_uninstall()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
+    if [ $(manifold_state) == NOT-INSTALLED ]; then
         echo "Manifold not installed!"
 	return
     fi
@@ -60,7 +60,7 @@ function manifold_uninstall()
 
 function manifold_ui()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
+    if [ $(manifold_state) == NOT-INSTALLED ]; then
         echo "Manifold not installed!"
 	return
     fi
@@ -71,7 +71,7 @@ function manifold_ui()
 
 function manifold_start()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
+    if [ $(manifold_state) == NOT-INSTALLED ]; then
         echo "Manifold not installed!"
 	return
     fi
@@ -97,7 +97,7 @@ function manifold_start()
 
 function manifold_stop()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
+    if [ $(manifold_state) == NOT-INSTALLED ]; then
         echo "Manifold not installed!"
 	return
     fi
