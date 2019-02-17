@@ -1,3 +1,5 @@
+# Description:
+#   Returns the full path of the calling/sourcing script.
 function utils_script_dir()
 {
     local _bash_source=$1
@@ -20,6 +22,25 @@ function utils_script_dir()
     #echo "_script_dir=$_script_dir"
 
     echo $_script_dir
+}
+
+
+function utils_check_shell()
+{
+    if [[ ! "$(readlink -f $(which sh))" =~ "bash" ]]; then
+        echo "ERROR: /bin/sh must point to Bash!"
+        if [ -f "/etc/debian_version" ]; then
+	    # System is probably using dash instead of bash.
+	    # dash was introduced for performance, see:
+            # https://wiki.ubuntu.com/DashAsBinSh
+            echo
+	    echo "You are probably using dash. To change this,"
+	    echo "use \"sudo dpkg-reconfigure dash\"          "
+	    echo
+	    echo "Exiting..."
+	    exit 1
+        fi
+    fi
 }
 
 
@@ -66,13 +87,14 @@ function utils_assert_arg()
 
 function utils_init()
 {
-    :
+    utils_check_shell
 }
+utils_init
 
 
 function utils_open_url()
 {
-     /usr/bin/firefox -new-tab "$1" &
+     /usr/bin/firefox -new-tab "$1" 2>/dev/null &
 }
 
 

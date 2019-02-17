@@ -4,12 +4,6 @@ source ./solr/solr_lib.sh
 
 function show_solr_menu()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
-        echo "Solr not installed!"
-	utils_press_any_key
-	return
-    fi
-
     local _choice=
     while [ "$_choice" != "x" ]
     do
@@ -18,33 +12,47 @@ function show_solr_menu()
 	echo "==========="
 	printf "%-8s : %s\n" "Solr status" "$(solr_state)"
         echo
-	echo "1) Search a core"
-        echo "2) Start Solr"
-	echo "3) Stop Solr"
-	echo "4) Restart Solr"
-	echo "5) List Solr cores"
-	echo "6) Create Solr core"
-	echo "7) Delete Solr core"
-	echo "8) Delete index of Solr core"
-	echo "9) Import sample docs"
-	echo "x) Exit menu"
+	echo "1)  Search a core"
+        echo "2)  Start Solr"
+	echo "3)  Stop Solr"
+	echo "4)  Restart Solr"
+	echo "5)  List Solr cores"
+	echo "6)  Create Solr core"
+	echo "7)  Delete Solr core"
+	echo "8)  Delete index of Solr core"
+	echo "9)  Import sample docs"
+	echo "10) Solr logs"
+	echo "11) Kill Solr process"
+	echo "12) Launch info page"
+	echo "x)  Exit menu"
 	echo
 	echo -n "Select option: "
         read _choice
 
 	case $_choice in
-        1) solr_menu_search_core;;
-	2) solr_start; utils_press_any_key;;
-	3) solr_stop; utils_press_any_key;;
-	4) solr_restart; utils_press_any_key;;
-        5) solr_menu_list_cores;;
-        6) solr_menu_create_core;;
-        7) solr_menu_delete_core;;
-	8) solr_menu_delete_index;;
-	9) solr_menu_import_sample_docs;;
+        1)  solr_menu_search_core;;
+	2)  solr_start;			utils_press_any_key;;
+	3)  solr_stop; 			utils_press_any_key;;
+	4)  solr_restart; 		utils_press_any_key;;
+        5)  solr_menu_list_cores;;
+        6)  solr_menu_create_core;;
+        7)  solr_menu_delete_core;;
+	8)  solr_menu_delete_index;;
+	9)  solr_menu_import_sample_docs;;
+	10) solr_menu_logs; 		utils_press_any_key;;
+	11) solr_kill;			utils_press_any_key;;
+	12) solr_info_page;		utils_press_any_key;;
 	x) return;;
 	esac
     done
+}
+
+
+function solr_menu_logs()
+{
+    echo
+    solr_logs
+    echo
 }
 
 
@@ -71,6 +79,14 @@ function solr_select_core()
         clear
         echo "$_title"
 	echo
+
+        if [ ${#_core_array[*]} -eq 0 ]; then
+            echo "No cores found"
+	    echo
+	    utils_press_any_key
+	    return
+        fi
+
         let _cnt=0
         for _c in "${_core_array[@]}"
         do
@@ -99,12 +115,6 @@ function solr_select_core()
 
 function solr_menu_import_sample_docs()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
-        echo "Solr not installed!"
-	utils_press_any_key
-	return
-    fi
-
     if [ "$(solr_state)" != "RUNNING" ]; then
         echo "Solr must be running!"
 	utils_press_any_key
@@ -112,7 +122,9 @@ function solr_menu_import_sample_docs()
     fi
 
     local _core
-    solr_select_core "_core" "Select core to import docs into:"
+    solr_select_core "_core" "Select core to import docs into:
+    
+(Note: The core must use the \"_default\" configset)"
     if [ ! -z "$_core" ]; then
         [ "$(solr_state)" == "STOPPED" ] && solr_start
         solr_import_sample_docs "$_core"
@@ -123,8 +135,8 @@ function solr_menu_import_sample_docs()
 
 function solr_menu_search_core()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
-        echo "Solr not installed!"
+    if [ $(solr_state) != "RUNNING" ]; then
+        echo "Solr must be running!"
 	utils_press_any_key
 	return
     fi
@@ -143,6 +155,7 @@ function solr_menu_list_cores()
 {
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
+	utils_press_any_key
 	return
     fi
 
@@ -159,6 +172,14 @@ function solr_menu_list_cores()
         clear
         echo "Existing Solr cores:"
 	echo
+
+        if [ ${#_core_array[*]} -eq 0 ]; then
+            echo "No cores found"
+	    echo
+	    utils_press_any_key
+	    return
+        fi
+
         let _cnt=0
         for _c in "${_core_array[@]}"
         do
@@ -176,6 +197,7 @@ function solr_menu_delete_core()
 {
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
+	utils_press_any_key
 	return
     fi
 
@@ -190,8 +212,9 @@ function solr_menu_delete_core()
 
 function solr_menu_create_core()
 {
-    if [ $(solr_state) == NOT-INSTALLED ]; then
-        echo "Solr not installed!"
+    if [ $(solr_state) != "RUNNING" ]; then
+        echo "Solr must be running!"
+	utils_press_any_key
 	return
     fi
 
@@ -211,7 +234,7 @@ function solr_menu_create_core()
     while [ "$_choice" != "x" ]
     do
 	clear
-        echo "Select configset to use:"
+        echo "Select configset for core \"$_core\":"
 	echo
 	eval $(solr_configsets)
 	let _cnt=0
@@ -246,6 +269,7 @@ function solr_menu_delete_index()
 {
     if [ $(solr_state) == NOT-INSTALLED ]; then
         echo "Solr not installed!"
+	utils_press_any_key
 	return
     fi
 

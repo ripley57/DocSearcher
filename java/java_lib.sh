@@ -7,10 +7,9 @@ function java_init()
     local _java_exe=$(which java)
     if [ -z "$_java_exe" ]; then
         echo "java_init: No Java found!"
-	echo
-	echo "If running on a Debian-based Linux:"
-	echo "sudo apt install openjdk-11-jre"
-	echo
+        if [ -f /etc/debian_version ]; then
+            utils_how_to_install_java_debian
+        fi
 	echo "Exiting..."
 	exit 1
     fi
@@ -60,6 +59,14 @@ function java_install()
     echo "any pre-prepared zips to simply extract!"
     echo
     if [ -f /etc/debian_version ]; then
+        utils_how_to_install_java_debian
+    fi
+}
+
+function utils_how_to_install_java_debian()
+{
+    if [ -f /etc/debian_version ]; then
+        echo
         echo "You appear to be running a Debian-based Linux,"
 	echo "so try this to install (OpenJDK) Java:"
         echo "    apt-get update"
