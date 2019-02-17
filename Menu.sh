@@ -37,8 +37,14 @@ function menu_solr_state()
     if solr_isRemote; then
         local _hostname="$(solr_gethostname)"
         echo "$(solr_state) (Remote $_hostname:$(solr_getport))"
+        return
+    fi
+
+    local _state=$(solr_state)
+    if [ "$_state" = "RUNNING" ]; then
+        echo "$_state:$(solr_getport)"
     else
-        echo "$(solr_state):$(solr_getport)"
+        echo "$_state"
     fi
 }
 
@@ -48,8 +54,14 @@ function menu_manifold_state()
     if manifold_isRemote; then
         local _hostname="$(manifold_gethostname)"
         echo "$(manifold_state) (Remote $_hostname:$(manifold_getport))"
+        return
+    fi
+
+    local _state=$(manifold_state)
+    if [ "$_state" = "RUNNING" ]; then
+        echo "$_state:$(manifold_getport)"
     else
-        echo "$(manifold_state):$(manifold_getport)"
+        echo "$_state"
     fi
 }
 
