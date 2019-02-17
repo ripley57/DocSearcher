@@ -75,8 +75,8 @@ function show_installation_menu()
 	echo "LOCAL INSTALLATION"
 	echo "=================="
         printf "%-8s : %-13s  %s\n" "Java"     "$(java_installed_state)" "(version: $(java_version))"
-	printf "%-8s : %-13s  %s\n" "Solr"     "$(solr_state)"           "(version: $(solr_version))"
-	printf "%-8s : %-13s  %s\n" "Manifold" "$(manifold_state)"       "(version: $(manifold_version))"
+	printf "%-8s : %-13s  %s\n" "Solr"     "$(menu_solr_state)"           "(version: $(solr_version))"
+	printf "%-8s : %-13s  %s\n" "Manifold" "$(menu_manifold_state)"       "(version: $(manifold_version))"
 	echo
 
 	# Bash arrays: https://www.linuxjournal.com/content/bash-arrays
