@@ -512,8 +512,11 @@ EOI
         echo
     else
         echo
-        echo "Unable to install systemd script for Solr."
-        echo "To manually configure systemd for Solr, run:"
+        echo "Unable to configure systemd for Solr!"
+	echo
+        echo "Retry this option as root, or follow these steps"
+        echo "to manually configure systemd:"
+        echo
         echo "cp $_script_tmp_path" "$_script_target_path"
         echo "systemctl daemon-reload"
         echo "systemctl enable solr"

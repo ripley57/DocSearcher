@@ -216,3 +216,58 @@ function manifold_info_page()
    echo "Launching Manifold info page ..."
    utils_open_url file://$DOCSEARCH_MANIFOLD_DIR/index.html
 }
+
+
+function manifold_systemd_install()
+{
+    local _script_target_path=/etc/systemd/system/manifold.service
+    local _script_tmp_path="${DOCSEARCH_MANIFOLD_DIR}/manifold.service"
+
+    if [ -f "$_script_target_path" ]; then
+        echo "Manifold systemd script already installed:"
+        echo "$_script_target_path"
+        return
+    fi
+
+    echo "Installing Manifold systemd script..."
+
+    cat <<EOI >"$_script_tmp_path"
+[Unit]
+Description=DocSearcher Manifold service
+After=network.target
+
+[Service]
+Type=forking
+TimeoutStartSec=120
+User=${USER}
+ExecStart=${DOCSEARCH_MANIFOLD_BIN_DIR}/start.sh
+ExecStop=${DOCSEARCH_MANIFOLD_BIN_DIR}/stop.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOI
+
+    if cp "$_script_tmp_path" "$_script_target_path" ; then
+        echo
+        echo "Successfully installed systemd script Manifold:"
+        echo "$_script_target_path"
+        echo
+        echo "Running \"systemctl daemon-reload\" ..."
+        systemctl daemon-reload
+        echo "Running \"systemctl enable manifold\" ..."
+        systemctl enable manifold
+        echo
+    else
+        echo
+        echo "Unable to configure systemd for Manifold!"
+	echo
+        echo "Retry this option as root, or follow these steps"
+        echo "to manually configure systemd:"
+        echo
+        echo "cp $_script_tmp_path" "$_script_target_path"
+        echo "systemctl daemon-reload"
+        echo "systemctl enable manifold"
+        echo
+    fi
+}

@@ -19,6 +19,7 @@ function show_manifold_menu()
 	echo "5) Manifold logs"
 	echo "6) Kill Manifold process"
         echo "7) Change Manifold host"
+        echo "8) Configure systemd for Manifold"
 	echo "x) Exit menu"
 	echo
 	echo -n "Select option: "
@@ -32,6 +33,7 @@ function show_manifold_menu()
 	5) manifold_menu_logs; 	utils_press_any_key;;
 	6) manifold_kill;	utils_press_any_key;;
         7) manifold_menu_hostname;;
+        8) manifold_systemd_install; utils_press_any_key;;
 	x) return;;
 	esac
     done

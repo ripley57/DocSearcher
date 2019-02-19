@@ -25,7 +25,7 @@ function show_solr_menu()
 	echo "11) Kill Solr process"
 	echo "12) Launch info page"
         echo "13) Change Solr host"
-        echo "14) Install systemd script"
+        echo "14) Configure systemd for Solr"
 	echo "x)  Exit menu"
 	echo
 	echo -n "Select option: "
