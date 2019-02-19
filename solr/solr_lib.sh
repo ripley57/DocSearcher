@@ -1,3 +1,17 @@
+function solr_user_check()
+{
+    # On Linux, Solr will abort if you try to run it as root.
+    if [ $(id -u) = "0" ]; then
+       echo
+       echo "WARNING: You are running as the root user. For security,"
+       echo "         Solr will not start when run as the root user".
+       echo
+       utils_press_any_key
+    fi
+}
+solr_user_check
+
+
 function solr_init()
 {
     local _pwd="$(utils_script_dir "$BASH_SOURCE")"
@@ -450,4 +464,59 @@ function solr_info_page()
     echo "Launching Solr info page ..."
 
     utils_open_url file://$DOCSEARCH_SOLR_DIR/index.html
+}
+
+
+function solr_systemd_install()
+{
+    local _script_target_path=/etc/systemd/system/solr.service
+    local _script_tmp_path="${DOCSEARCH_SOLR_DIR}/solr.service"
+
+    if [ -f "$_script_target_path" ]; then
+        echo "Solr systemd script already installed:"
+        echo "$_script_target_path"
+        return
+    fi
+
+    echo "Installing Solr systemd script..."
+
+    cat <<EOI >"$_script_tmp_path"
+[Unit]
+Description=DocSearcher Solr service
+After=network.target
+
+[Service]
+Type=forking
+TimeoutStartSec=360
+User=${USER}
+ExecStart=${DOCSEARCH_SOLR_BIN_DIR}/solr start -m 1g
+ExecStop=${DOCSEARCH_SOLR_BIN_DIR}/solr stop -all
+PIDFile=${DOCSEARCH_SOLR_BIN_DIR}/solr-${DOCSEARCH_SOLR_PORT}.pid
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOI
+    
+    if cp "$_script_tmp_path" "$_script_target_path" ; then
+        echo
+        echo "Successfully installed systemd script for Solr:"
+        echo "$_script_target_path"
+        echo
+        # If we installed the script under /etc then we might
+        # also have required permissions to enable the script.
+        echo "Running \"systemctl daemon-reload\" ..."
+        systemctl daemon-reload
+        echo "RUnning \"systemctl enable solr\" ..."
+        systemctl enable solr
+        echo
+    else
+        echo
+        echo "Unable to install systemd script for Solr."
+        echo "To manually configure systemd for Solr, run:"
+        echo "cp $_script_tmp_path" "$_script_target_path"
+        echo "systemctl daemon-reload"
+        echo "systemctl enable solr"
+        echo
+    fi
 }

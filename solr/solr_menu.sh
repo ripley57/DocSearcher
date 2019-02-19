@@ -25,6 +25,7 @@ function show_solr_menu()
 	echo "11) Kill Solr process"
 	echo "12) Launch info page"
         echo "13) Change Solr host"
+        echo "14) Install systemd script"
 	echo "x)  Exit menu"
 	echo
 	echo -n "Select option: "
@@ -44,6 +45,7 @@ function show_solr_menu()
 	11) solr_menu_kill;		utils_press_any_key;;
 	12) solr_info_page;		utils_press_any_key;;
         13) solr_menu_hostname;;
+        14) solr_systemd_install;	utils_press_any_key;;
 	x) return;;
 	esac
     done
