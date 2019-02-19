@@ -85,13 +85,6 @@ function utils_assert_arg()
 }
 
 
-function utils_init()
-{
-    utils_check_shell
-}
-utils_init
-
-
 function utils_open_url()
 {
      /usr/bin/firefox -new-tab "$1" 2>/dev/null &
@@ -244,4 +237,72 @@ function utils_service_state()
     fi
     echo $_ret
 }
+
+function utils_install_netstat()
+{
+    echo "(CentOS): yum install net-tools"
+}
+function utils_install_unzip()
+{
+    echo "(CentOS): yum install unzip"
+}
+function utils_install_which()
+{
+    echo "(CentOS): yum install which"
+}
+function utils_install_wget()
+{
+    echo "(CentOS): yum install wget"
+}
+
+function utils_install_nc()
+{
+    echo "(CentOS): yum install nmap-ncat"
+}
+function utils_check_prereqs()
+{
+    local _prereq_array
+    declare -A _prereq_array=(\
+['/usr/bin/netstat']=utils_install_netstat \
+['/usr/bin/unzip']=utils_install_unzip \
+['/usr/bin/which']=utils_install_which \
+['/usr/bin/wget']=utils_install_wget \
+['/usr/bin/nc']=utils_install_nc \
+)
+   local _ret=0 ;# No problems and no missing pre-reqs
+   local _file_path=
+   for _file_path in ${!_prereq_array[*]}
+   do
+       if [ ! -e "$_file_path" ]; then
+	    local _installation_steps=${_prereq_array["$_file_path"]}
+            if [ ! -z "$_installation_steps" ]; then
+                echo
+	        echo "WARNING: Pre-req not installed: $_file_path"
+	        echo "To install:"
+	        eval "$_installation_steps"
+                _ret=1 
+            else
+                echo
+                echo "WARNING: Don't know how to install pre-req: $_file_path"
+                _ret=1
+            fi
+       fi
+    done
+    return $_ret
+}
+
+
+function utils_init()
+{
+    if ! utils_check_prereqs; then
+        printf "\n%s\n\n" "Exiting..."
+        exit 99
+    fi
+
+    if ! utils_check_shell; then
+        printf "\n%s\n\n" "Exiting..."
+        exit 98
+    fi
+}
+utils_init
 

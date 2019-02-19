@@ -1,4 +1,4 @@
-source ./manifold/manifold_menu.sh
+source ./manifold/manifold_menu.sh 
 source ./solr/solr_menu.sh
 
 function show_docsearcher_menu()
