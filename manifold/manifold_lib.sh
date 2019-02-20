@@ -243,9 +243,10 @@ Description=DocSearcher Manifold service
 After=network.target
 
 [Service]
-Type=forking
-TimeoutStartSec=120
+Type=simple
+TimeoutStartSec=240
 User=${USER}
+WorkingDirectory=${DOCSEARCH_MANIFOLD_BIN_DIR}
 ExecStart=${DOCSEARCH_MANIFOLD_BIN_DIR}/start.sh
 ExecStop=${DOCSEARCH_MANIFOLD_BIN_DIR}/stop.sh
 Restart=on-failure
