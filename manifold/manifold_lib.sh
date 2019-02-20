@@ -223,8 +223,14 @@ function manifold_systemd_install()
     local _script_target_path=/etc/systemd/system/manifold.service
     local _script_tmp_path="${DOCSEARCH_MANIFOLD_DIR}/manifold.service"
 
+    if [ ! -d /etc/systemd/system ]; then
+        echo "Not a systemd system!"
+        return
+    fi
+
     if [ -f "$_script_target_path" ]; then
-        echo "Manifold systemd script already installed:"
+        echo "Manifold systemd script already installed!"
+        echo "To re-install, remove the file:"
         echo "$_script_target_path"
         return
     fi

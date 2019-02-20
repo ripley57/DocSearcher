@@ -472,8 +472,14 @@ function solr_systemd_install()
     local _script_target_path=/etc/systemd/system/solr.service
     local _script_tmp_path="${DOCSEARCH_SOLR_DIR}/solr.service"
 
+    if [ ! -d /etc/systemd/system ]; then
+        echo "Not a systemd system!"
+        return
+    fi
+
     if [ -f "$_script_target_path" ]; then
-        echo "Solr systemd script already installed:"
+        echo "Solr systemd script already installed!"
+        echo "To re-install, remove the file:"
         echo "$_script_target_path"
         return
     fi
