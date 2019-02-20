@@ -28,6 +28,11 @@ function manifold_version()
 }
 
 
+function manifold_is_systemd_managed()
+{
+    [ -f "/etc/systemd/system/manifold.service" ]
+}
+
 function manifold_install()
 {
     if manifold_isRemote; then
@@ -129,8 +134,16 @@ function manifold_start()
     fi
 
     echo "Starting Manifold..."
+
     utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "$DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
-    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./start.sh 2>&1 &)
+
+    if manifold_is_systemd_managed; then
+        echo "systemctl start manifold ..."
+        systemctl start manifold
+    else
+        (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./start.sh 2>&1 &)
+    fi
+    
     sleep 60
 
     if [ $(manifold_state) == RUNNING ]; then
@@ -155,8 +168,16 @@ function manifold_stop()
     fi
 
     echo "Stopping Manifold..."
+
     utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "$DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
-    (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./stop.sh 2>&1 &) 2>&1
+
+    if manifold_is_systemd_managed ; then
+        echo "systemctl stop manifold ..."
+        systemctl stop manifold
+    else
+        (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./stop.sh 2>&1 &) 2>&1
+    fi
+
     sleep 30
 
     if [ $(manifold_state) == STOPPED ]; then
@@ -237,6 +258,9 @@ function manifold_systemd_install()
 
     echo "Installing Manifold systemd script..."
 
+    chmod +x "${DOCSEARCH_MANIFOLD_BIN_DIR}/start.sh"
+    chmod +x "${DOCSEARCH_MANIFOLD_BIN_DIR}/stop.sh"
+
     cat <<EOI >"$_script_tmp_path"
 [Unit]
 Description=DocSearcher Manifold service
@@ -245,7 +269,7 @@ After=network.target
 [Service]
 Type=simple
 TimeoutStartSec=240
-User=${USER}
+User=$(whoami)
 WorkingDirectory=${DOCSEARCH_MANIFOLD_BIN_DIR}
 ExecStart=${DOCSEARCH_MANIFOLD_BIN_DIR}/start.sh
 ExecStop=${DOCSEARCH_MANIFOLD_BIN_DIR}/stop.sh
