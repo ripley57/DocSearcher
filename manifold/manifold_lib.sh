@@ -30,7 +30,9 @@ function manifold_version()
 
 function manifold_is_systemd_managed()
 {
-    [ -f "/etc/systemd/system/manifold.service" ]
+    # Need to be root (or in sudoers to run systemctl. 
+    # We are not (yet) updating the sudoers file, so we need to be root.
+    [ -f "/etc/systemd/system/manifold.service" ] && [ "$(whoami)" = "root" ]
 }
 
 function manifold_install()

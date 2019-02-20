@@ -47,6 +47,14 @@ function solr_version()
 }
 
 
+function solr_is_systemd_managed()
+{
+    # Need to be root (or in sudoers to run systemctl. 
+    # We are not (yet) updating the sudoers file, so we need to be root.
+    [ -f "/etc/systemd/system/solr.service" ] && [ "$(whoami)" = "root" ]
+}
+
+
 function solr_getport()
 {
     echo "$DOCSEARCH_SOLR_PORT"
@@ -230,8 +238,16 @@ function solr_start()
     fi
 
     echo "Starting Solr..."
+
     utils_assert_var "DOCSEARCH_SOLR_BIN_DIR" "solr_start"
-    (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr start -m 1g 2>&1 >/dev/null) 2>&1 >/dev/null &
+
+    if solr_is_systemd_managed; then
+        echo "systemctl start solr ..."
+        systemctl start solr
+    else
+        (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr start -m 1g 2>&1 >/dev/null) 2>&1 >/dev/null &
+    fi
+
     sleep 60
 
     if [ $(solr_state) == RUNNING ]; then
@@ -261,13 +277,22 @@ function solr_stop()
     fi
 
     echo "Stopping Solr..."
+
     utils_assert_var "DOCSEARCH_SOLR_BIN_DIR" "solr_stop"
-    (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr stop -all 2>&1 >/dev/null) 2>&1 >/dev/null
+
+    if solr_is_systemd_managed; then
+        echo "systemctl stop solr ..."
+        systemctl stop solr
+    else
+        (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr stop -all 2>&1 >/dev/null) 2>&1 >/dev/null
+    fi
+
+    sleep 30
 
     if [ $(solr_state) == STOPPED ]; then
         echo "Solr successfully stopped."
     else
-        echo "solr_start: Failed to stop Solr!"
+        echo "Failed to stop Solr!"
 	return
     fi
 }
