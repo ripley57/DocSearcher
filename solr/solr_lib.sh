@@ -71,7 +71,14 @@ function solr_user_check()
 
 function solr_is_sudoers_configured()
 {
-    [ -f /etc/sudoers.d/docsearcher_solr ]
+    # Note: This won't work unless we are root user, due to
+    #       access restrictions to /etc/sudoers.d/
+    if utils_is_root_user ; then
+        [ -f /etc/sudoers.d/docsearcher_solr ]
+    else
+        # We'll rely solely on the systemd config.
+        solr_is_systemd_configured
+    fi
 }
 
 
@@ -101,12 +108,12 @@ function solr_configure_sudoers()
     local _sudoers_src="${DOCSEARCH_SOLR_DIR}/.sudoers_solr"
     local _sudoers_tgt="/etc/sudoers.d/docsearcher_solr"
 
-    if [ -f "$_sudoers_tgt" ]; then
-        echo "Sudoers already configured for Solr!"
-        echo "To re-configure, remove file:"
-        echo "$_sudoers_tgt"
-        return 0
-    fi
+    #if [ -f "$_sudoers_tgt" ]; then
+    #    echo "Sudoers already configured for Solr!"
+    #    echo "To re-configure, remove file:"
+    #    echo "$_sudoers_tgt"
+    #    return 0
+    #fi
 
     if [ ! -d /etc/sudoers.d/ ]; then
         echo "Installing sudo ..."
@@ -117,7 +124,7 @@ function solr_configure_sudoers()
     # the current user to stop/start Solr using systemctl.
     cat <<EOI >"$_sudoers_src"
 
-Cmnd_Alias SERVICES_SOLR = /bin/systemctl start, /bin/systemctl stop, /bin/systemctl enable, /bin/systemctl disable, /bin/systemctl status
+Cmnd_Alias SERVICES_SOLR = /bin/systemctl start solr, /bin/systemctl stop solr, /bin/systemctl enable solr, /bin/systemctl disable solr, /bin/systemctl status solr
 
 $_solr_user ALL=(root) NOPASSWD: SERVICES_SOLR
 
@@ -129,6 +136,9 @@ EOI
         chown root:        "$_sudoers_tgt"
         chmod 0440         "$_sudoers_tgt" 
     fi
+
+    # Ensure correct ownership of solr files.
+    chown -R $_solr_user $DOCSEARCH_SOLR_BIN_DIR
 
     [ -f "$_sudoers_tgt" ]
 }
@@ -599,6 +609,10 @@ function solr_info_page()
 
 function solr_systemd_install()
 {
+    local _solr_user=$1
+
+    utils_assert_var "_solr_user" "$_solr_user" "solr_systemd_install"
+
     if [ "$(whoami)" != "root" ]; then
         echo "You must be root to run this!"
         return 1
@@ -612,12 +626,12 @@ function solr_systemd_install()
         return 1
     fi
 
-    if [ -f "$_script_tgt" ]; then
-        echo "Systemd script already installed!"
-        echo "To re-install, remove the file:"
-        echo "$_script_tgt"
-        return 0
-    fi
+    #if [ -f "$_script_tgt" ]; then
+    #    echo "Systemd script already installed!"
+    #    echo "To re-install, remove the file:"
+    #    echo "$_script_tgt"
+    #    return 0
+    #fi
 
     echo "Installing Solr systemd script..."
 
@@ -629,7 +643,7 @@ After=network.target
 [Service]
 Type=forking
 TimeoutStartSec=360
-User=${USER}
+User=$_solr_user
 ExecStart=${DOCSEARCH_SOLR_BIN_DIR}/solr start -m 1g
 ExecStop=${DOCSEARCH_SOLR_BIN_DIR}/solr stop -all
 PIDFile=${DOCSEARCH_SOLR_BIN_DIR}/solr-${DOCSEARCH_SOLR_PORT}.pid
@@ -654,7 +668,7 @@ EOI
         echo
         echo "Unable to configure systemd for Solr!"
 	echo
-        echo "to manually configure systemd:"
+        echo "To manually configure systemd:"
         echo "cp $_script_src" "$_script_tgt"
         echo "systemctl daemon-reload"
         echo "systemctl enable solr"

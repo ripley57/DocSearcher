@@ -4,6 +4,7 @@ function manifold_init()
     #echo "manifold_init: _pwd=$_pwd"
     DOCSEARCH_MANIFOLD_VERSION=1.9
     DOCSEARCH_MANIFOLD_PORT=8345
+    DOCSEARCH_MANIFOLD_USER_VAR="manifold_user"
     DOCSEARCH_MANIFOLD_DIR="${_pwd}"
     DOCSEARCH_MANIFOLD_BIN_DIR="${_pwd}/apache-manifoldcf-1.9/example"
     DOCSEARCH_MANIFOLD_DOWNLOAD_ZIP_URL=http://archive.apache.org/dist/manifoldcf/apache-manifoldcf-1.9/apache-manifoldcf-1.9-bin.zip
@@ -19,7 +20,6 @@ function manifold_init()
     # Stores persisted values.
     DOCSEARCH_MANIFOLD_PERSISTED_VALUES="$DOCSEARCH_MANIFOLD_DIR/.persisted_values"
 }
-manifold_init
 
 
 function manifold_version()
@@ -28,12 +28,132 @@ function manifold_version()
 }
 
 
-function manifold_is_systemd_managed()
+function manifold_getport()
 {
-    # Need to be root (or in sudoers to run systemctl. 
-    # We are not (yet) updating the sudoers file, so we need to be root.
-    [ -f "/etc/systemd/system/manifold.service" ] && [ "$(whoami)" = "root" ]
+    echo "$DOCSEARCH_MANIFOLD_PORT"
 }
+
+
+function manifold_get_user_var()
+{
+    echo "$DOCSEARCH_MANIFOLD_USER_VAR"
+}
+
+
+function manifold_set_user()
+{
+    manifold_set_persisted_value "$(manifold_get_user_var)" "$1"
+}
+
+
+function manifold_get_user()
+{
+    manifold_get_persisted_value "$(manifold_get_user_var)"
+}
+
+
+function manifold_is_systemd_configured()
+{
+    [ -f "/etc/systemd/system/manifold.service" ]
+}
+
+
+function manifold_is_systemd_configured_display()
+{
+    if manifold_is_systemd_configured ; then
+        echo "yes"
+    else
+        echo "no"
+    fi 
+}
+
+
+function manifold_is_sudoers_configured()
+{
+    # Note: This won't work unless we are root user, due to
+    #       access restrictions to /etc/sudoers.d/
+    if utils_is_root_user ; then
+        [ -f /etc/sudoers.d/docsearcher_manifold ]
+    else 
+        # We'll rely solely on the systemd config.
+        manifold_is_systemd_configured
+    fi
+}
+
+
+function manifold_is_sudoers_configured_display()
+{
+    if manifold_is_sudoers_configured ; then
+        echo "yes"
+    else
+        echo "no"
+    fi 
+}
+
+
+function manifold_configure_sudoers()
+{
+    local _manifold_user=$1
+
+    utils_assert_var "_manifold_user" "$_manifold_user" "manifold_configure_sudoers"
+
+    echo "Configuring sudoers for Manifold..."
+
+    if [ "$(whoami)" != "root" ]; then
+        echo "You must be root to run this!"
+        return 1
+    fi   
+
+    local _sudoers_src="${DOCSEARCH_MANIFOLD_DIR}/.sudoers_manifold"
+    local _sudoers_tgt="/etc/sudoers.d/docsearcher_manifold"
+
+    #if [ -f "$_sudoers_tgt" ]; then
+    #    echo "Sudoers already configured for Manifold!"
+    #    echo "To re-configure, remove file:"
+    #    echo "$_sudoers_tgt"
+    #    return 0
+    #fi
+
+    if [ ! -d /etc/sudoers.d/ ]; then
+        echo "Installing sudo ..."
+        yum install sudo || return 1
+    fi
+
+    # Create a sudoers file in /etc/sudoers.d/ to allow
+    # the current user to stop/start Manifold using systemctl.
+    cat <<EOI >"$_sudoers_src"
+
+Cmnd_Alias SERVICES_MANIFOLD = /bin/systemctl start manifold, /bin/systemctl stop manifold, /bin/systemctl enable manifold, /bin/systemctl disable manifold, /bin/systemctl status manifold
+
+$_manifold_user ALL=(root) NOPASSWD: SERVICES_MANIFOLD
+
+EOI
+
+    # Install our sudoers file.
+    if [ -f "$_sudoers_src" ]; then
+        cp "$_sudoers_src" "$_sudoers_tgt" 
+        chown root:        "$_sudoers_tgt"
+        chmod 0440         "$_sudoers_tgt" 
+    fi
+
+    # Ensure correct ownership of Manifold files.
+    chown -R $_manifold_user $DOCSEARCH_MANIFOLD_BIN_DIR
+
+    [ -f "$_sudoers_tgt" ]
+}
+
+
+function manifold_set_persisted_value()
+{
+    utils_set_persisted_value "$DOCSEARCH_MANIFOLD_PERSISTED_VALUES" "$1" "$2"
+}
+
+
+function manifold_get_persisted_value()
+{
+    utils_get_persisted_value "$DOCSEARCH_MANIFOLD_PERSISTED_VALUES" "$1"
+}
+
 
 function manifold_install()
 {
@@ -80,12 +200,6 @@ function manifold_uninstall()
 }
 
 
-function manifold_getport()
-{
-    echo "$DOCSEARCH_MANIFOLD_PORT"
-}
-
-
 function manifold_gethostname()
 {
     local _hostname=
@@ -125,6 +239,11 @@ function manifold_ui()
 
 function manifold_start()
 {
+    if manifold_isRemote ; then
+        echo "Cannot start Manifold! It is running remotely [$(manifold_gethostname)]"
+        return
+    fi
+
     if [ $(manifold_state) == NOT-INSTALLED ]; then
         echo "Manifold not installed!"
 	return
@@ -137,11 +256,10 @@ function manifold_start()
 
     echo "Starting Manifold..."
 
-    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "$DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
-
-    if manifold_is_systemd_managed; then
-        echo "systemctl start manifold ..."
-        systemctl start manifold
+    if manifold_is_systemd_configured && manifold_is_sudoers_configured; then
+        local _cmd="sudo systemctl start manifold"
+        echo "$_cmd ..."
+        eval "$_cmd"
     else
         (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./start.sh 2>&1 &)
     fi
@@ -159,6 +277,11 @@ function manifold_start()
 
 function manifold_stop()
 {
+    if manifold_isRemote ; then
+        echo "Cannot start Manifold! It is running remotely [$(manifold_gethostname)]"
+        return
+    fi
+
     if [ $(manifold_state) == NOT-INSTALLED ]; then
         echo "Manifold not installed!"
 	return
@@ -171,11 +294,10 @@ function manifold_stop()
 
     echo "Stopping Manifold..."
 
-    utils_assert_var "DOCSEARCH_MANIFOLD_BIN_DIR" "$DOCSEARCH_MANIFOLD_BIN_DIR" "manifold_start"
-
-    if manifold_is_systemd_managed ; then
-        echo "systemctl stop manifold ..."
-        systemctl stop manifold
+    if manifold_is_systemd_configured && manifold_is_sudoers_configured; then
+        local _cmd="sudo systemctl stop manifold"
+        echo "$_cmd ..."
+        eval "$_cmd"
     else
         (cd "${DOCSEARCH_MANIFOLD_BIN_DIR}" && sh ./stop.sh 2>&1 &) 2>&1
     fi
@@ -243,27 +365,36 @@ function manifold_info_page()
 
 function manifold_systemd_install()
 {
-    local _script_target_path=/etc/systemd/system/manifold.service
-    local _script_tmp_path="${DOCSEARCH_MANIFOLD_DIR}/manifold.service"
+    local _manifold_user=$1
+
+    utils_assert_var "_manifold_user" "$_manifold_user" "manifold_systemd_install"
+
+    if [ "$(whoami)" != "root" ]; then
+        echo "You must be root to run this!"
+        return 1
+    fi   
+
+    local _script_src="${DOCSEARCH_MANIFOLD_DIR}/manifold.service"
+    local _script_tgt=/etc/systemd/system/manifold.service
 
     if [ ! -d /etc/systemd/system ]; then
         echo "Not a systemd system!"
         return
     fi
 
-    if [ -f "$_script_target_path" ]; then
-        echo "Manifold systemd script already installed!"
-        echo "To re-install, remove the file:"
-        echo "$_script_target_path"
-        return
-    fi
+    #if [ -f "$_script_tgt" ]; then
+    #    echo "Manifold systemd script already installed!"
+    #    echo "To re-install, remove the file:"
+    #    echo "$_script_tgt"
+    #    return
+    #fi
 
     echo "Installing Manifold systemd script..."
 
     chmod +x "${DOCSEARCH_MANIFOLD_BIN_DIR}/start.sh"
     chmod +x "${DOCSEARCH_MANIFOLD_BIN_DIR}/stop.sh"
 
-    cat <<EOI >"$_script_tmp_path"
+    cat <<EOI >"$_script_src"
 [Unit]
 Description=DocSearcher Manifold service
 After=network.target
@@ -271,7 +402,7 @@ After=network.target
 [Service]
 Type=simple
 TimeoutStartSec=240
-User=$(whoami)
+User=$_manifold_user
 WorkingDirectory=${DOCSEARCH_MANIFOLD_BIN_DIR}
 ExecStart=${DOCSEARCH_MANIFOLD_BIN_DIR}/start.sh
 ExecStop=${DOCSEARCH_MANIFOLD_BIN_DIR}/stop.sh
@@ -281,26 +412,27 @@ Restart=on-failure
 WantedBy=multi-user.target
 EOI
 
-    if cp "$_script_tmp_path" "$_script_target_path" ; then
+    if cp "$_script_src" "$_script_tgt" ; then
         echo
-        echo "Successfully installed systemd script Manifold:"
-        echo "$_script_target_path"
+        echo "Successfully installed systemd script for Manifold:"
+        echo "$_script_tgt"
         echo
-        echo "Running \"systemctl daemon-reload\" ..."
-        systemctl daemon-reload
-        echo "Running \"systemctl enable manifold\" ..."
-        systemctl enable manifold
-        echo
+        local _cmd
+        _cmd="systemctl daemon-reload"
+        echo "$_cmd ..." ; eval "$_cmd"
+        _cmd="systemctl enable manifold"
+        echo "$_cmd ..." ; eval "$_cmd"
+        return 0
     else
         echo
         echo "Unable to configure systemd for Manifold!"
 	echo
-        echo "Retry this option as root, or follow these steps"
-        echo "to manually configure systemd:"
-        echo
-        echo "cp $_script_tmp_path" "$_script_target_path"
+        echo "To manually configure systemd:"
+        echo "cp $_script_src" "$_script_tgt"
         echo "systemctl daemon-reload"
         echo "systemctl enable manifold"
-        echo
+        return 1
     fi
 }
+
+manifold_init

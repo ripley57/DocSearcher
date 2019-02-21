@@ -292,6 +292,12 @@ function utils_check_prereqs()
 }
 
 
+function utils_is_root_user()
+{
+    [ "$(whoami)" = "root" ]
+}
+
+
 function utils_init()
 {
     if ! utils_check_prereqs; then

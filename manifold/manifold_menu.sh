@@ -10,7 +10,12 @@ function show_manifold_menu()
         clear
 	echo "MANAGE MANIFOLD"
 	echo "==============="
-	printf "%s : %s\n" "Manifold state" "$(manifold_menu_state)"
+	printf "%-18s : %s\n" "Manifold state"     "$(manifold_menu_state)"
+        printf "%-18s : %s\n" "Manifold user"      "$(manifold_get_user)"
+        printf "%-18s : %s\n" "Systemd configured" "$(manifold_is_systemd_configured_display)"
+        if utils_is_root_user ; then
+            printf "%-18s : %s\n" "Sudoers configured" "$(manifold_is_sudoers_configured_display)"
+        fi
         echo
 	echo "1) Start Manifold"
         echo "2) Stop Manifold"
@@ -19,7 +24,7 @@ function show_manifold_menu()
 	echo "5) Manifold logs"
 	echo "6) Kill Manifold process"
         echo "7) Change Manifold host"
-        echo "8) Configure systemd for Manifold"
+        echo "8) Configure systemd & sudoers"
 	echo "x) Exit menu"
 	echo
 	echo -n "Select option: "
@@ -33,10 +38,33 @@ function show_manifold_menu()
 	5) manifold_menu_logs; 	utils_press_any_key;;
 	6) manifold_kill;	utils_press_any_key;;
         7) manifold_menu_hostname;;
-        8) manifold_systemd_install; utils_press_any_key;;
+        8) manifold_menu_systemd_install; utils_press_any_key;;
 	x) return;;
 	esac
     done
+}
+
+
+function manifold_menu_systemd_install()
+{
+    if ! utils_is_root_user ; then
+        echo "You must be root to run this!"
+        return 1
+    fi   
+
+    echo -n "Enter user Manifold will run as: "
+    local _manifold_user=
+    read _manifold_user
+    if [ -z "$_manifold_user" ]; then
+        echo "No user specified, so will do nothing."
+        return
+    fi
+    if manifold_configure_sudoers "$_manifold_user"; then
+        manifold_set_user "$_manifold_user"
+        manifold_systemd_install "$_manifold_user"
+    else
+        echo "Sorry, unable to configure systemd and sudoers for Manifold!"
+    fi
 }
 
 

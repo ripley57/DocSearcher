@@ -13,7 +13,9 @@ function show_solr_menu()
 	printf "%-18s : %s\n" "Solr state" 	   "$(menu_solr_state)"
         printf "%-18s : %s\n" "Solr user"          "$(solr_get_user)"
         printf "%-18s : %s\n" "Systemd configured" "$(solr_is_systemd_configured_display)"
-        printf "%-18s : %s\n" "Sudoers configured" "$(solr_is_sudoers_configured_display)"
+        if utils_is_root_user ; then
+            printf "%-18s : %s\n" "Sudoers configured" "$(solr_is_sudoers_configured_display)"
+        fi
         echo
 	echo "1)  Search a core"
         echo "2)  Start Solr"
@@ -57,7 +59,7 @@ function show_solr_menu()
 
 function solr_menu_systemd_install()
 {
-    if [ "$(whoami)" != "root" ]; then
+    if ! utils_is_root_user ; then
         echo "You must be root to run this!"
         return 1
     fi   
@@ -71,7 +73,7 @@ function solr_menu_systemd_install()
     fi
     if solr_configure_sudoers "$_solr_user"; then
         solr_set_user "$_solr_user"
-        solr_systemd_install
+        solr_systemd_install "$_solr_user"
     else
         echo "Sorry, unable to configure systemd and sudoers for Solr!"
     fi
