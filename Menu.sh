@@ -9,8 +9,9 @@ function show_docsearcher_menu()
         clear
 	echo "DOCUMENT SEARCHER"
 	echo "================="
-	printf "%-14s : %s\n" "Solr state" 	"$(menu_solr_state)"
-	printf "%-14s : %s\n" "Manifold state"	"$(menu_manifold_state)"
+        printf "%-15s : %s\n" "Running as user" "$(whoami)"
+	printf "%-15s : %s\n" "Solr state" 	"$(menu_solr_state)"
+	printf "%-15s : %s\n" "Manifold state"	"$(menu_manifold_state)"
         echo
 	echo "1) Perform a Search"
         echo "2) Manage Solr"
@@ -74,9 +75,9 @@ function show_installation_menu()
         clear
 	echo "LOCAL INSTALLATION"
 	echo "=================="
-        printf "%-8s : %-13s  %s\n" "Java"     "$(java_installed_state)" "(version: $(java_version))"
 	printf "%-8s : %-13s  %s\n" "Solr"     "$(menu_solr_state)"           "(version: $(solr_version))"
 	printf "%-8s : %-13s  %s\n" "Manifold" "$(menu_manifold_state)"       "(version: $(manifold_version))"
+        printf "%-8s : %-13s  %s\n" "Java"     "$(java_installed_state)" "(version: $(java_version))"
 	echo
 
 	# Bash arrays: https://www.linuxjournal.com/content/bash-arrays

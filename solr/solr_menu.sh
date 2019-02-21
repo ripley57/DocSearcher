@@ -10,7 +10,10 @@ function show_solr_menu()
         clear
 	echo "MANAGE SOLR"
 	echo "==========="
-	printf "%s : %s\n" "Solr state" "$(solr_menu_state)"
+	printf "%-18s : %s\n" "Solr state" 	   "$(menu_solr_state)"
+        printf "%-18s : %s\n" "Solr user"          "$(solr_get_user)"
+        printf "%-18s : %s\n" "Systemd configured" "$(solr_is_systemd_configured_display)"
+        printf "%-18s : %s\n" "Sudoers configured" "$(solr_is_sudoers_configured_display)"
         echo
 	echo "1)  Search a core"
         echo "2)  Start Solr"
@@ -25,7 +28,7 @@ function show_solr_menu()
 	echo "11) Kill Solr process"
 	echo "12) Launch info page"
         echo "13) Change Solr host"
-        echo "14) Configure systemd for Solr"
+        echo "14) Configure systemd & sudoers"
 	echo "x)  Exit menu"
 	echo
 	echo -n "Select option: "
@@ -45,10 +48,33 @@ function show_solr_menu()
 	11) solr_menu_kill;		utils_press_any_key;;
 	12) solr_info_page;		utils_press_any_key;;
         13) solr_menu_hostname;;
-        14) solr_systemd_install;	utils_press_any_key;;
+        14) solr_menu_systemd_install;	utils_press_any_key;;
 	x) return;;
 	esac
     done
+}
+
+
+function solr_menu_systemd_install()
+{
+    if [ "$(whoami)" != "root" ]; then
+        echo "You must be root to run this!"
+        return 1
+    fi   
+
+    echo -n "Enter user Solr will run as: "
+    local _solr_user=
+    read _solr_user
+    if [ -z "$_solr_user" ]; then
+        echo "No user specified, so will do nothing."
+        return
+    fi
+    if solr_configure_sudoers "$_solr_user"; then
+        solr_set_user "$_solr_user"
+        solr_systemd_install
+    else
+        echo "Sorry, unable to configure systemd and sudoers for Solr!"
+    fi
 }
 
 

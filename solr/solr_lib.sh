@@ -1,23 +1,10 @@
-function solr_user_check()
-{
-    # On Linux, Solr will abort if you try to run it as root.
-    if [ $(id -u) = "0" ]; then
-       echo
-       echo "WARNING: You are running as the root user. For security,"
-       echo "         Solr will not start when run as the root user".
-       echo
-       utils_press_any_key
-    fi
-}
-solr_user_check
-
-
 function solr_init()
 {
     local _pwd="$(utils_script_dir "$BASH_SOURCE")"
     #echo "solr_init: _pwd=$_pwd"
     DOCSEARCH_SOLR_VERSION=7.3.1
     DOCSEARCH_SOLR_PORT=8983
+    DOCSEARCH_SOLR_USER_VAR="solr_user"
     DOCSEARCH_SOLR_DIR="${_pwd}"
     DOCSEARCH_SOLR_BIN_DIR="${_pwd}/solr-7.3.1/bin"
     DOCSEARCH_SOLR_SERVER_DIR="${_pwd}/solr-7.3.1/server"
@@ -38,20 +25,11 @@ function solr_init()
     # Stores persisted values.
     DOCSEARCH_SOLR_PERSISTED_VALUES="$DOCSEARCH_SOLR_DIR/.persisted_values"
 }
-solr_init
 
 
 function solr_version()
 {
     echo $DOCSEARCH_SOLR_VERSION
-}
-
-
-function solr_is_systemd_managed()
-{
-    # Need to be root (or in sudoers to run systemctl. 
-    # We are not (yet) updating the sudoers file, so we need to be root.
-    [ -f "/etc/systemd/system/solr.service" ] && [ "$(whoami)" = "root" ]
 }
 
 
@@ -61,10 +39,117 @@ function solr_getport()
 }
 
 
+function solr_get_user_var()
+{
+    echo "$DOCSEARCH_SOLR_USER_VAR"
+}
+
+
+function solr_set_user()
+{
+    solr_set_persisted_value "$(solr_get_user_var)" "$1"
+}
+
+
+function solr_get_user()
+{
+    solr_get_persisted_value "$(solr_get_user_var)"
+}
+
+
+function solr_user_check()
+{
+    if [ $(id -u) = "0" ]; then
+       echo
+       echo "WARNING: You are running as the root user. For security,"
+       echo "         Solr will not start when run as the root user".
+       echo
+       utils_press_any_key
+    fi
+}
+
+
+function solr_is_sudoers_configured()
+{
+    [ -f /etc/sudoers.d/docsearcher_solr ]
+}
+
+
+function solr_is_sudoers_configured_display()
+{
+    if solr_is_sudoers_configured ; then
+        echo "yes"
+    else
+        echo "no"
+    fi 
+}
+
+
+function solr_configure_sudoers()
+{
+    local _solr_user=$1
+
+    utils_assert_var "_solr_user" "$_solr_user" "solr_configure_sudoers"
+
+    echo "Configuring sudoers for Solr..."
+
+    if [ "$(whoami)" != "root" ]; then
+        echo "You must be root to run this!"
+        return 1
+    fi   
+
+    local _sudoers_src="${DOCSEARCH_SOLR_DIR}/.sudoers_solr"
+    local _sudoers_tgt="/etc/sudoers.d/docsearcher_solr"
+
+    if [ -f "$_sudoers_tgt" ]; then
+        echo "Sudoers already configured for Solr!"
+        echo "To re-configure, remove file:"
+        echo "$_sudoers_tgt"
+        return 0
+    fi
+
+    if [ ! -d /etc/sudoers.d/ ]; then
+        echo "Installing sudo ..."
+        yum install sudo || return 1
+    fi
+
+    # Create a sudoers file in /etc/sudoers.d/ to allow
+    # the current user to stop/start Solr using systemctl.
+    cat <<EOI >"$_sudoers_src"
+
+Cmnd_Alias SERVICES_SOLR = /bin/systemctl start, /bin/systemctl stop, /bin/systemctl enable, /bin/systemctl disable, /bin/systemctl status
+
+$_solr_user ALL=(root) NOPASSWD: SERVICES_SOLR
+
+EOI
+
+    # Install our sudoers file.
+    if [ -f "$_sudoers_src" ]; then
+        cp "$_sudoers_src" "$_sudoers_tgt" 
+        chown root:        "$_sudoers_tgt"
+        chmod 0440         "$_sudoers_tgt" 
+    fi
+
+    [ -f "$_sudoers_tgt" ]
+}
+
+
+function solr_set_persisted_value()
+{
+    utils_set_persisted_value "$DOCSEARCH_SOLR_PERSISTED_VALUES" "$1" "$2"
+}
+
+
+function solr_get_persisted_value()
+{
+    utils_get_persisted_value "$DOCSEARCH_SOLR_PERSISTED_VALUES" "$1"
+}
+
+
 function solr_gethostname()
 {
     local _hostname=
-    _hostname="$(utils_get_persisted_value "$DOCSEARCH_SOLR_PERSISTED_VALUES" "hostname")"
+    _hostname="$(solr_get_persisted_value "hostname")"
     if [ -z "$_hostname" ] || [ "$_hostname" = "undefined" ]; then
         echo "localhost"
     else
@@ -73,17 +158,17 @@ function solr_gethostname()
 }
 
 
+function solr_isRemote()
+{
+    [ "$(solr_gethostname)" != "localhost" ]
+}
+
+
 function solr_sethostname()
 {
     local _hostname=$1
     utils_assert_var "_hostname" "$_hostname" "solr_sethostname"
-    utils_set_persisted_value "$DOCSEARCH_SOLR_PERSISTED_VALUES" "hostname" "$_hostname"
-}
-
-
-function solr_isRemote()
-{
-    [ "$(solr_gethostname)" != "localhost" ]
+    solr_set_persisted_value "hostname" "$_hostname"
 }
 
 
@@ -94,6 +179,17 @@ function solr_install()
         echo "Sorry, Solr is running remotely [$(solr_gethostname)]."
         echo "Reset the Solr hostname to locahost if you want"
         echo "to install Solr locally!"
+        echo
+        return
+    fi
+
+    if [ "$(whoami)" = "root" ]; then
+        echo
+        echo "Sorry, you cannot run this option as root!"
+        echo
+        echo "Solr must be run as a non-root user."
+        echo "To correctly install Solr, you must execute" 
+        echo "this option as the user that Solr will run as."
         echo
         return
     fi
@@ -164,9 +260,9 @@ function solr_install_overlay()
 function solr_apply_fixes()
 {
     echo "Applying our Solr fixes ..."
-
     sed -i '711,711s/< <(/ <\$(/' "$DOCSEARCH_SOLR_BIN_DIR/solr"
 }
+
 
 function solr_install_myconfigsets()
 {
@@ -220,6 +316,22 @@ function solr_search_core()
 }
 
 
+function solr_is_systemd_configured()
+{
+    [ -f "/etc/systemd/system/solr.service" ]
+}
+
+
+function solr_is_systemd_configured_display()
+{
+    if solr_is_systemd_configured ; then
+       echo "yes"
+    else
+       echo "no"
+    fi
+}
+
+
 function solr_start()
 {
     if solr_isRemote ; then
@@ -239,11 +351,10 @@ function solr_start()
 
     echo "Starting Solr..."
 
-    utils_assert_var "DOCSEARCH_SOLR_BIN_DIR" "solr_start"
-
-    if solr_is_systemd_managed; then
-        echo "systemctl start solr ..."
-        systemctl start solr
+    if solr_is_systemd_configured && solr_is_sudoers_configured; then
+        local _cmd="sudo systemctl start solr"
+        echo "$_cmd ..."
+        eval "$_cmd"
     else
         (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr start -m 1g 2>&1 >/dev/null) 2>&1 >/dev/null &
     fi
@@ -253,7 +364,7 @@ function solr_start()
     if [ $(solr_state) == RUNNING ]; then
         echo "Solr successfully started."
     else
-        echo "solr_start: Failed to start Solr!"
+        echo "Failed to start Solr!"
 	return
     fi
 }
@@ -278,13 +389,12 @@ function solr_stop()
 
     echo "Stopping Solr..."
 
-    utils_assert_var "DOCSEARCH_SOLR_BIN_DIR" "solr_stop"
-
-    if solr_is_systemd_managed; then
-        echo "systemctl stop solr ..."
-        systemctl stop solr
+    if solr_is_systemd_configured && solr_is_sudoers_configured; then
+        local _cmd="sudo systemctl stop solr"
+        echo "$_cmd ..."
+        eval "$_cmd"
     else
-        (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr stop -all 2>&1 >/dev/null) 2>&1 >/dev/null
+        (cd "${DOCSEARCH_SOLR_BIN_DIR}" && sh ./solr stop -all 2>&1 >/dev/null) 2>&1 >/dev/null &
     fi
 
     sleep 30
@@ -310,21 +420,17 @@ function solr_restart()
 	return
     fi
 
-    if [ $(solr_state) == RUNNING ]; then
-        solr_stop
-    fi
-
-    if [ $(solr_state) != STOPPED ]; then
-        echo "solr_restart: Failed to stop Solr!"
-	return
-    fi
-
     echo "Restarting Solr..."
-    utils_assert_var "DOCSEARCH_SOLR_BIN_DIR" "solr_restart"
-    (cd "$DOCSEARCH_SOLR_BIN_DIR" && sh ./solr restart -p $DOCSEARCH_SOLR_PORT -m 1g 2>&1 >/dev/null) 2>&1 >/dev/null
+
+    if solr_is_systemd_configured && solr_is_sudoers_configured; then
+        solr_stop
+        solr_start
+    else
+        (cd "$DOCSEARCH_SOLR_BIN_DIR" && sh ./solr restart -p $DOCSEARCH_SOLR_PORT -m 1g 2>&1 >/dev/null) 2>&1 >/dev/null &
+    fi
 
     if [ $(solr_state) != RUNNING ]; then
-        echo "solr_restart: Failed to start Solr!"
+        echo "Failed to restart Solr!"
 	return
     fi
 }
@@ -487,31 +593,35 @@ function solr_kill()
 function solr_info_page()
 {
     echo "Launching Solr info page ..."
-
     utils_open_url file://$DOCSEARCH_SOLR_DIR/index.html
 }
 
 
 function solr_systemd_install()
 {
-    local _script_target_path=/etc/systemd/system/solr.service
-    local _script_tmp_path="${DOCSEARCH_SOLR_DIR}/solr.service"
+    if [ "$(whoami)" != "root" ]; then
+        echo "You must be root to run this!"
+        return 1
+    fi   
+
+    local _script_src="${DOCSEARCH_SOLR_DIR}/solr.service"
+    local _script_tgt=/etc/systemd/system/solr.service
 
     if [ ! -d /etc/systemd/system ]; then
         echo "Not a systemd system!"
-        return
+        return 1
     fi
 
-    if [ -f "$_script_target_path" ]; then
-        echo "Solr systemd script already installed!"
+    if [ -f "$_script_tgt" ]; then
+        echo "Systemd script already installed!"
         echo "To re-install, remove the file:"
-        echo "$_script_target_path"
-        return
+        echo "$_script_tgt"
+        return 0
     fi
 
     echo "Installing Solr systemd script..."
 
-    cat <<EOI >"$_script_tmp_path"
+    cat <<EOI >"$_script_src"
 [Unit]
 Description=DocSearcher Solr service
 After=network.target
@@ -529,28 +639,28 @@ Restart=on-failure
 WantedBy=multi-user.target
 EOI
     
-    if cp "$_script_tmp_path" "$_script_target_path" ; then
+    if cp "$_script_src" "$_script_tgt" ; then
         echo
         echo "Successfully installed systemd script for Solr:"
-        echo "$_script_target_path"
+        echo "$_script_tgt"
         echo
-        # If we installed the script under /etc then we might
-        # also have required permissions to enable the script.
-        echo "Running \"systemctl daemon-reload\" ..."
-        systemctl daemon-reload
-        echo "RUnning \"systemctl enable solr\" ..."
-        systemctl enable solr
-        echo
+        local _cmd
+        _cmd="systemctl daemon-reload"
+        echo "$_cmd ..." ; eval "$_cmd"
+        _cmd="systemctl enable solr"
+        echo "$_cmd ..." ; eval "$_cmd"
+        return 0
     else
         echo
         echo "Unable to configure systemd for Solr!"
 	echo
-        echo "Retry this option as root, or follow these steps"
         echo "to manually configure systemd:"
-        echo
-        echo "cp $_script_tmp_path" "$_script_target_path"
+        echo "cp $_script_src" "$_script_tgt"
         echo "systemctl daemon-reload"
         echo "systemctl enable solr"
-        echo
+        return 1
     fi
 }
+
+solr_init
+#solr_user_check
