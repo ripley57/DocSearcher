@@ -1,3 +1,30 @@
+
+function utils_how_to_install_java_debian()
+{
+    if [ -f /etc/debian_version ]; then
+        echo
+        echo "You appear to be running a Debian-based Linux,"
+	echo "so try this to install (OpenJDK) Java:"
+        echo "    apt-get update"
+        echo "    apt-get install default-jdk"
+        echo
+        echo "Or if you want to install Oracle JDK:"
+        echo "    apt-get update"
+        echo "    add-apt-repository ppa:webupd8team/java"
+        echo "    apt-get update"
+        echo "    apt-get install oracle-java8-installer"
+        echo 
+        echo "To later choose which installed Java to use"
+        echo "(and see where the JAVA_HOME directory is):"
+        echo "    update-alternatives --config java"
+	echo 
+	echo "See:"
+	echo "https://thishosting.rocks/install-java-ubuntu/#ubuntu-default"
+	echo
+    fi
+}
+
+
 function java_init()
 {
     # Try to auto-configure the Java environment, by
@@ -60,30 +87,5 @@ function java_install()
     echo
     if [ -f /etc/debian_version ]; then
         utils_how_to_install_java_debian
-    fi
-}
-
-function utils_how_to_install_java_debian()
-{
-    if [ -f /etc/debian_version ]; then
-        echo
-        echo "You appear to be running a Debian-based Linux,"
-	echo "so try this to install (OpenJDK) Java:"
-        echo "    apt-get update"
-        echo "    apt-get install default-jdk"
-        echo
-        echo "Or if you want to install Oracle JDK:"
-        echo "    apt-get update"
-        echo "    add-apt-repository ppa:webupd8team/java"
-        echo "    apt-get update"
-        echo "    apt-get install oracle-java8-installer"
-        echo 
-        echo "To later choose which installed Java to use"
-        echo "(and see where the JAVA_HOME directory is):"
-        echo "    update-alternatives --config java"
-	echo 
-	echo "See:"
-	echo "https://thishosting.rocks/install-java-ubuntu/#ubuntu-default"
-	echo
     fi
 }
