@@ -48,6 +48,12 @@ REM
 		copy %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\doc.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\docx.png 2>&1 >nul
 		copy %_solr_install_dir%\server\solr-webapp\webapp\img\ico\mail.png %_solr_install_dir%\server\solr-webapp\webapp\img\filetypes\msg.png 2>&1 >nul
 	)
+
+	REM Fix solr error:
+	REM java.lang.NoClassDefFoundError: com/uwyn/jhighlight/renderer/XhtmlRendererFactory
+	if not exist %_solr_install_dir%\server\lib\jhighlight-1.0.jar (
+		copy %pwd%\jhighlight-1.0.jar %_solr_install_dir%\server\lib\jhighlight-1.0.jar 2>&1 >nul
+	)
 	
 :END_MAIN
 	if defined TRACE %TRACE% [proc :MAIN return]
