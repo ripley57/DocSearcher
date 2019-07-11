@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source ./manifold/manifold_menu.sh 
 source ./solr/solr_menu.sh
 

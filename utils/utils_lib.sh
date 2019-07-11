@@ -241,6 +241,7 @@ function utils_service_state()
 function utils_install_netstat()
 {
     echo "(CentOS): yum install net-tools"
+    echo "(Mint):   apt install net-tools"
 }
 function utils_install_unzip()
 {
@@ -259,25 +260,55 @@ function utils_install_nc()
 {
     echo "(CentOS): yum install nmap-ncat"
 }
+
+function utils_get_os_name()
+{
+    local _os=Linux
+    local _uname1="$(uname -a)"
+    local _uname2="${_uname1^^}" ;# Convert to uppercase
+    if [[ $_uname2 =~ UBUNTU ]]; then
+	_os=ubuntu
+    fi
+    echo $_os
+}
+
 function utils_check_prereqs()
 {
+    local _ret=0 ;# No problems and no missing pre-reqs
+
     local _prereq_array
     declare -A _prereq_array=(\
-['/usr/bin/netstat']=utils_install_netstat \
-['/usr/bin/unzip']=utils_install_unzip \
-['/usr/bin/which']=utils_install_which \
-['/usr/bin/wget']=utils_install_wget \
-['/usr/bin/nc']=utils_install_nc \
+['/usr/bin/netstat',linux]=utils_install_netstat \
+['/bin/netstat',ubuntu]=utils_install_netstat \
+['/usr/bin/unzip',linux]=utils_install_unzip \
+['/usr/bin/unzip',ubuntu]=utils_install_unzip \
+['/usr/bin/which',linux]=utils_install_which \
+['/usr/bin/which',ubuntu]=utils_install_which \
+['/usr/bin/wget',linux]=utils_install_wget \
+['/usr/bin/wget',ubuntu]=utils_install_wget \
+['/usr/bin/nc',linux]=utils_install_nc \
+['/bin/nc',ubuntu]=utils_install_nc \
 )
-   local _ret=0 ;# No problems and no missing pre-reqs
-   local _file_path=
-   for _file_path in ${!_prereq_array[*]}
+
+   local _array_key=
+   local _array_file_path=
+   local _array_os=
+   local _os=$(utils_get_os_name)
+
+   for _array_key in ${!_prereq_array[*]}
    do
-       if [ ! -e "$_file_path" ]; then
-	    local _installation_steps=${_prereq_array["$_file_path"]}
+       _array_file_path=${_array_key%,*}
+       _array_os=${_array_key#*,}
+
+       if [ "$_os" != "$_array_os" ]; then
+           continue
+       fi
+
+       if [ ! -e "$_array_file_path" ]; then
+	    local _installation_steps=${_prereq_array["$_array_file_path",$_os]}
             if [ ! -z "$_installation_steps" ]; then
                 echo
-	        echo "WARNING: Pre-req not installed: $_file_path"
+	        echo "WARNING: Pre-req not installed: $_array_file_path"
 	        echo "To install:"
 	        eval "$_installation_steps"
                 _ret=1 
