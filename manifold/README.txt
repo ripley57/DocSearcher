@@ -56,6 +56,8 @@ smbclient examples (smbclient: https://www.samba.org/samba/docs/current/man-html
 o Connect to share "LXF":
 smbclient '\\localhost\LXF' -U user1 user1
 smb: \> ls
+o One-liner version:
+smbclient '\\localhost\LXF' -U user1 user1 -c 'ls'
  
 
 FYI:
