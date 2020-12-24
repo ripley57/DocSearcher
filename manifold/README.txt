@@ -19,6 +19,8 @@ See simply steps here:
 https://techviewleo.com/install-and-configure-samba-file-sharing-on-linux-mint/
 Note: I didnt change my "[global]" section at all.
 There is a copy of my working smb.conf in this directory (working on Linux Mint 19.1).
+Restarting samba:
+sudo systemctl restart smbd nmbd
 
 6. Create a repository using the type "Windows shares". This type should now be listed.
 Use the following values:
@@ -49,6 +51,12 @@ o Created a symlink named "DS":
 ls /home/jcdc/Downloads/tmp/docs
 lxf
 
+smbclient examples (smbclient: https://www.samba.org/samba/docs/current/man-html/smbclient.1.html)
+==================
+o Connect to share "LXF":
+smbclient '\\localhost\LXF' -U user1 user1
+smb: \> ls
+ 
 
 FYI:
 o That French company using Manifold and Solr:
