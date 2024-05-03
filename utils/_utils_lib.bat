@@ -99,6 +99,8 @@ REM
 	set FUNC-UTILS-GET-IE-PATH_ERROR_TEXT=
 	set RET=
 
+	set ie_exe="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" 
+	if exist %ie_exe% (set RET=%ie_exe% & goto :EXIT-FUNC-UTILS-GET-IE-PATH)
 	set ie_exe="C:\Program Files\Internet Explorer\iexplore.exe"
 	if exist %ie_exe% (set RET=%ie_exe% & goto :EXIT-FUNC-UTILS-GET-IE-PATH) 
 	set ie_exe="C:\Program Files (x86)\Internet Explorer\iexplore.exe"
